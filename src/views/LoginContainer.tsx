@@ -2,18 +2,13 @@ import { FC, useState, useContext } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { IAuthContext, TLoginResponse, TRequest } from '../models/global';
-import { AuthContext } from '../components/auth/AuthContext';
-import useClient from '../hooks/useClient';
-import { AUTH_ACTION } from '../constants/constants';
-import { PERMISSION } from '../lib/Permissions';
 
 type TFValues = {
   email: string;
   password: string;
 };
 
-const LoginForm: FC = () => {
+const Login: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
@@ -80,7 +75,7 @@ const LoginForm: FC = () => {
             <div>
               <img
                 className="max-w-[100px] w-full pb-8"
-                // src={webmaneLogo}
+                src={webmaneLogo}
                 alt="webmane logo"
               />
             </div>
@@ -158,4 +153,4 @@ const LoginContainer = styled.div`
   padding: 2.5rem;
 `;
 
-export default LoginForm;
+export default Login;
