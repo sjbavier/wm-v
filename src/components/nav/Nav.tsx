@@ -9,10 +9,12 @@ import classNames from 'classnames';
 import { AUTH_ACTION } from '../../constants/constants';
 import { DivWrapper, IAuthContext } from '../../models/global';
 import { Color } from '../color/Color';
+import { NeuButton } from '../button/NeuButton';
 
 interface NavProps {
   isOpen: boolean | (() => void);
-  toggleIsOpen: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  // toggleIsOpen: React.MouseEvent<HTMLDivElement>;
+  toggleIsOpen: React.MouseEventHandler<HTMLDivElement> | undefined;
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -46,10 +48,10 @@ const Nav: FC<NavProps> = ({
 
   return (
     <header>
-      <Button
+      <NeuButton
         onClick={toggleIsOpen}
         className={classNames(
-          'fixed top-7 z-10 flex flex-col h-12 w-12 justify-center items-center group transition-all duration-150',
+          'fixed top-7 z-10 flex flex-col h-12 w-12 justify-center items-center group transition-all duration-150 cursor-pointer',
           isOpen ? 'left-[172px]' : 'left-1'
         )}
       >
@@ -75,7 +77,7 @@ const Nav: FC<NavProps> = ({
               : 'opacity-50 group-hover:opacity-100'
           )}
         ></div>
-      </Button>
+      </NeuButton>
       <NavWrapper
         className={classNames(
           'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[220px]',
@@ -98,32 +100,32 @@ const Nav: FC<NavProps> = ({
             webmane
           </h1>
           <div className="grow ">
-            <Button
+            <NeuButton
               onClick={() => navigate('')}
               className="mt-5 w-full flex items-center "
             >
               home
-            </Button>
+            </NeuButton>
             {!!user && (
               <>
-                <Button
+                <NeuButton
                   onClick={() => navigate('/bookmarks/page/1/page_size/10')}
                   className="w-full flex items-center "
                 >
                   bookmarks
-                </Button>{' '}
-                <Button
+                </NeuButton>{' '}
+                <NeuButton
                   onClick={() => navigate('/reference')}
                   className="w-full flex items-center "
                 >
                   reference
-                </Button>
-                <Button
+                </NeuButton>
+                <NeuButton
                   onClick={() => navigate('/graphics')}
                   className="w-full flex items-center "
                 >
                   Graphics
-                </Button>
+                </NeuButton>
               </>
             )}
           </div>
