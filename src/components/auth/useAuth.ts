@@ -9,7 +9,7 @@ import {
   IAuthState,
   TAuthResponse,
   TRequest
-} from '../../models/global';
+} from '../../global';
 import { AUTH_ACTION, VERBOSITY } from '../../constants/constants';
 // export type TAuthResponse = {
 //   userId: number;

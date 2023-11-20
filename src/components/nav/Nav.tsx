@@ -2,18 +2,16 @@ import { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mantine/core';
 import { AuthContext } from '../auth/AuthContext';
-// import webmaneLogo from '../../img/LionHeadLOGO.svg';
+import webmaneLogo from '../../assets/LionHeadLOGO.svg';
 
 import styled from 'styled-components';
 import classNames from 'classnames';
 import { AUTH_ACTION } from '../../constants/constants';
-import { DivWrapper, IAuthContext } from '../../models/global';
 import { Color } from '../color/Color';
 import { NeuButton } from '../button/NeuButton';
 
 interface NavProps {
   isOpen: boolean | (() => void);
-  // toggleIsOpen: React.MouseEvent<HTMLDivElement>;
   toggleIsOpen: React.MouseEventHandler<HTMLDivElement> | undefined;
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
@@ -48,39 +46,9 @@ const Nav: FC<NavProps> = ({
 
   return (
     <header>
-      <NeuButton
-        onClick={toggleIsOpen}
-        className={classNames(
-          'fixed top-7 z-10 flex flex-col h-12 w-12 justify-center items-center group transition-all duration-150 cursor-pointer',
-          isOpen ? 'left-[172px]' : 'left-1'
-        )}
-      >
-        <div
-          className={classNames(
-            hamburgLine,
-            isOpen
-              ? 'rotate-45 translate-y-[10px] opacity-50 group-hover:opacity-100'
-              : 'opacity-50 group-hover:opacity-100'
-          )}
-        ></div>
-        <div
-          className={classNames(
-            hamburgLine,
-            isOpen ? 'opacity-0' : 'opacity-50 group-hover:opacity-100'
-          )}
-        ></div>
-        <div
-          className={classNames(
-            hamburgLine,
-            isOpen
-              ? '-rotate-45 -translate-y-[10px] opacity-50 group-hover:opacity-100'
-              : 'opacity-50 group-hover:opacity-100'
-          )}
-        ></div>
-      </NeuButton>
       <NavWrapper
         className={classNames(
-          'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[220px]',
+          'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[33%]',
           isOpen ? 'ml-0' : '-ml-[230px]'
         )}
       >
@@ -91,7 +59,7 @@ const Nav: FC<NavProps> = ({
           >
             <img
               className="w-full pt-6 pb-3"
-              // src={webmaneLogo}
+              src={webmaneLogo}
               alt="Webmane logo"
               style={{ maxWidth: 'calc(200px / 4)' }}
             />

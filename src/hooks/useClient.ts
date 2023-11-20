@@ -2,7 +2,7 @@ import { useCallback, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/auth/AuthContext';
 import { useHandleNotifications } from './useNotifications';
-import { IAuthContext, TRequest } from '../models/global';
+import { IAuthContext, TRequest } from '../global';
 import { AUTH_ACTION } from '../constants/constants';
 
 // const apiErrors = {

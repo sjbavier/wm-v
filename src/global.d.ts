@@ -1,4 +1,4 @@
-export interface AppProps {
+declare interface AppProps {
   children?: React.ReactNode; // best, accepts everything React can render
   childrenElement: JSX.Element; // A single React element
   style?: React.CSSProperties; // to pass through style props
@@ -49,14 +49,14 @@ export interface AppProps {
   // props2: Props & React.ComponentPropsWithRef<MyButtonWithForwardRef>; // to impersonate all the props of MyButtonForwardedRef and explicitly forwarding its ref
 }
 
-export type TRequest = {
+declare type TRequest = {
   method: string;
   path: string;
   data?: any;
   token?: string;
 };
 
-export type TLoginResponse = {
+declare type TLoginResponse = {
   userId: number;
   user: string;
   role: string;
@@ -64,41 +64,41 @@ export type TLoginResponse = {
   message: string;
 };
 
-export interface IBookmarks {
+declare interface IBookmarks {
   title: string;
   bookmark_id: number;
   categories_collection: ICategory[];
   link: string;
 }
 
-export interface ICategory {
+declare interface ICategory {
   name: string;
   category_id: number;
 }
 
-export interface DivWrapper extends React.HTMLAttributes<HTMLDivElement> {
+declare interface DivWrapper extends React.HTMLAttributes<HTMLDivElement> {
   callback?: Function;
 }
 
-export type TResponseReferenceStructure = {
+declare type TResponseReferenceStructure = {
   hash: string;
   path: string;
   reference_structure_id: number;
   structure?: string;
 };
 
-export type TStructure = {
+declare type TStructure = {
   children?: TStructure[];
   name: string;
   path: string;
   type: 'directory' | 'file' | 'hidden';
 };
 
-export type Graphic = {
+declare type Graphic = {
   description: string;
   url: string;
 };
-export type TAuthResponse = {
+declare type TAuthResponse = {
   userId: number;
   user: string;
   role: string;
@@ -106,7 +106,7 @@ export type TAuthResponse = {
   msg?: string;
 };
 
-export interface IAuthState {
+declare interface IAuthState {
   userId?: string;
   user?: string;
   scopes?: string[];
@@ -115,12 +115,12 @@ export interface IAuthState {
   loading?: boolean;
 }
 
-export interface IAuthAction {
+declare interface IAuthAction {
   type: string;
   payload?: IAuthState;
 }
 
-export interface IAuthContext extends IAuthState {
+declare interface IAuthContext extends IAuthState {
   fetchUser: any;
   dispatchAuth: any;
 }
