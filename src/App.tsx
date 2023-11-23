@@ -26,13 +26,15 @@ const App: FC = () => {
   const { loading } = useContext<IAuthContext>(AuthContext);
   const [isOpen, toggleIsOpen] = useToggle(true);
   const [color, setColor] = useState<string>(
-    localStorage.getItem('customColor')?.toString() || '#191b22'
+    localStorage.getItem('customColor')?.toString() || ''
   );
 
   return (
     <PerspectiveWrapper
       color={color}
-      className={classNames('h-full w-full fixed perspective-9')}
+      className={classNames(
+        `h-full w-full fixed perspective-9 ${color ? '' : 'bg-wm_dk_blue-700'}`
+      )}
     >
       <NavButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
       <Nav
@@ -43,7 +45,7 @@ const App: FC = () => {
       />
       <Container
         isOpen={isOpen}
-        className={classNames('absolute w-full h-full')}
+        className={classNames('absolute w-full h-full bg-wm_dk_blue-500')}
       >
         {!loading && (
           <Routes>
@@ -156,8 +158,10 @@ const Container = styled.div<ContainerProps>`
     transform 0.4s,
     background-size 0.4s;
   transform-origin: 50% 150%;
-  background: #363636;
+  transition-delay: ${({ isOpen }) => (isOpen ? '0.2s' : '0.4s')};
   transform: ${(props) =>
-    props.isOpen ? 'translateZ(-600px) rotateY(-50deg)' : 'none'};
+    props.isOpen
+      ? 'translateZ(-600px) rotateY(-50deg) translateX(10%)'
+      : 'none'};
 `;
 export default App;

@@ -181,13 +181,13 @@ const UserButton = styled(Button)`
 const UserItem = styled.div`
   min-width: 50%;
   align-self: center;
+  padding: 1.4rem 0;
   justify-self: stretch;
   align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   transition: all 0.2s ease-in;
-  height: 3.31rem;
   cursor: pointer;
   &:hover {
     background-color: hsla(0, 0%, 55%, 0.04);
@@ -195,7 +195,6 @@ const UserItem = styled.div`
   > div {
     align-self: center;
     align-items: center;
-    font-size: 0.9em;
     color: #fff;
   }
 `;
@@ -204,7 +203,6 @@ const UserBox = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  font-size: 1.3rem;
   user-select: none;
   border-radius: 0px;
   border: transparent;
@@ -246,11 +244,14 @@ const NavWrapper = styled.div`
   perspective: 1500px;
 `;
 const NavContainer = styled.div<NavContainerProps>`
+  font-size: 166%;
   transition: transform 0.4s;
-  transition-delay: ${({ isOpen }) => (isOpen ? '0.2s' : '50ms')};
+  transition-delay: ${({ isOpen }) => (isOpen ? '0.4s' : '0.2s')};
   transform-origin: 50% 150%;
   transform: ${(props) =>
-    props.isOpen ? 'translateZ(-150px) rotateY(30deg)' : 'none'};
+    props.isOpen
+      ? 'translateZ(-600px) rotateY(30deg) translateX(15%)'
+      : 'translateZ(-1500px)'};
 `;
 
 export default Nav;
