@@ -9,16 +9,26 @@ import classNames from 'classnames';
 import { AUTH_ACTION } from '../../constants/constants';
 import { Color } from '../color/Color';
 import { NeuButton } from '../button/NeuButton';
+import {
+  IconHomeHeart,
+  IconUserCircle,
+  IconUserFilled,
+  IconUserQuestion
+} from '@tabler/icons-react';
+import { IconUserPlus } from '@tabler/icons-react';
 
 interface NavProps {
   isOpen: boolean | (() => void);
-  toggleIsOpen: React.MouseEventHandler<HTMLDivElement> | undefined;
+  // toggleIsOpen: React.MouseEventHandler<HTMLDivElement> | undefined;
   color: string;
   setColor: React.Dispatch<React.SetStateAction<string>>;
 }
 
+interface NavContainerProps {
+  isOpen: boolean | (() => void);
+}
 const Nav: FC<NavProps> = ({
-  toggleIsOpen,
+  // toggleIsOpen,
   isOpen,
   color,
   setColor
@@ -41,38 +51,35 @@ const Nav: FC<NavProps> = ({
     setSettings(!settings);
   };
 
-  const hamburgLine =
-    'h-0.5 w-6 my-1 rounded-full bg-white transition-all duration-150 delay-200';
-
   return (
     <header>
       <NavWrapper
         className={classNames(
-          'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[33%]',
-          isOpen ? 'ml-0' : '-ml-[230px]'
+          'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[33%]'
         )}
       >
-        <div className="flex flex-col h-full">
+        <NavContainer isOpen={isOpen} className="flex flex-col h-full">
           <div
             className="flex justify-center items-center cursor-pointer"
             onClick={() => navigate('')}
           >
             <img
-              className="w-full pt-6 pb-3"
+              className="w-full pt-6 pb-1"
               src={webmaneLogo}
               alt="Webmane logo"
-              style={{ maxWidth: 'calc(200px / 4)' }}
+              style={{ maxWidth: 'calc(200px / 3)' }}
             />
           </div>
-          <h1 className="text-zinc-50 text-center tracking-widest text-xs">
+          <h1 className="text-zinc-50 text-center tracking-widest text-xs uppercase ">
             webmane
           </h1>
           <div className="grow ">
             <NeuButton
               onClick={() => navigate('')}
-              className="mt-5 w-full flex items-center "
+              className="mt-5 w-full flex items-center justify-end"
             >
               home
+              <IconHomeHeart className="ml-4" />
             </NeuButton>
             {!!user && (
               <>
@@ -101,7 +108,7 @@ const Nav: FC<NavProps> = ({
           <UserBox>
             <UserPopUpWrapper
               className={classNames(
-                'w-[220px]',
+                'w-full',
                 popUp ? '' : 'invisible collapsed hidden'
               )}
             >
@@ -125,11 +132,11 @@ const Nav: FC<NavProps> = ({
               {!user && (
                 <>
                   <UserItem onClick={() => navigate('/login')}>
-                    <div>user avatar</div>
+                    <IconUserCircle />
                     <div>Login</div>
                   </UserItem>
                   <UserItem onClick={() => navigate('/Signup')}>
-                    <div>add user</div>
+                    <IconUserPlus />
                     <div>Signup</div>
                   </UserItem>
                 </>
@@ -140,11 +147,18 @@ const Nav: FC<NavProps> = ({
               onClick={handleAvatarClick}
             >
               <UserAvatar />
-              <UserText>{user ? user : 'unknown'}</UserText>
+              <UserText className="inline-flex">
+                {user ? user : 'unknown'}
+                {user ? (
+                  <IconUserFilled className="ml-4" />
+                ) : (
+                  <IconUserQuestion className="ml-4" />
+                )}
+              </UserText>
               <UserButton />
             </div>
           </UserBox>
-        </div>
+        </NavContainer>
       </NavWrapper>
     </header>
   );
@@ -190,6 +204,7 @@ const UserBox = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  font-size: 1.3rem;
   user-select: none;
   border-radius: 0px;
   border: transparent;
@@ -227,6 +242,15 @@ const UserPopUpWrapper = styled(UserPopUp)`
   }
 `;
 
-const NavWrapper = styled.div``;
+const NavWrapper = styled.div`
+  perspective: 1500px;
+`;
+const NavContainer = styled.div<NavContainerProps>`
+  transition: transform 0.4s;
+  transition-delay: ${({ isOpen }) => (isOpen ? '0.2s' : '50ms')};
+  transform-origin: 50% 150%;
+  transform: ${(props) =>
+    props.isOpen ? 'translateZ(-150px) rotateY(30deg)' : 'none'};
+`;
 
 export default Nav;

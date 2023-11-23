@@ -36,7 +36,7 @@ const App: FC = () => {
     >
       <NavButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
       <Nav
-        toggleIsOpen={toggleIsOpen}
+        // toggleIsOpen={toggleIsOpen}
         isOpen={isOpen}
         color={color}
         setColor={setColor}
