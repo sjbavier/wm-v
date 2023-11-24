@@ -107,10 +107,7 @@ const Nav: FC<NavProps> = ({
 
           <UserBox>
             <UserPopUpWrapper
-              className={classNames(
-                'w-full',
-                popUp ? '' : 'invisible collapsed hidden'
-              )}
+              className={classNames(popUp ? '' : 'invisible collapsed hidden')}
             >
               {!!user && (
                 <>
@@ -142,21 +139,18 @@ const Nav: FC<NavProps> = ({
                 </>
               )}
             </UserPopUpWrapper>
-            <div
-              className="flex items-center justify-between w-full p-2"
+            <NeuButton
+              className=" w-full items-center inline-flex justify-center"
               onClick={handleAvatarClick}
             >
               <UserAvatar />
-              <UserText className="inline-flex">
-                {user ? user : 'unknown'}
-                {user ? (
-                  <IconUserFilled className="ml-4" />
-                ) : (
-                  <IconUserQuestion className="ml-4" />
-                )}
-              </UserText>
-              <UserButton />
-            </div>
+              {user ? (
+                <IconUserFilled className="mr-4" />
+              ) : (
+                <IconUserQuestion className="mr-4" />
+              )}
+              {user ? user : 'unknown'}
+            </NeuButton>
           </UserBox>
         </NavContainer>
       </NavWrapper>
@@ -165,18 +159,6 @@ const Nav: FC<NavProps> = ({
 };
 
 const UserAvatar = styled.div``;
-
-const UserText = styled.div`
-  color: #fff;
-`;
-
-const UserButton = styled(Button)`
-  background: none;
-  color: #fff;
-  border: none;
-  align-self: center;
-  /* margin-left: auto; */
-`;
 
 const UserItem = styled.div`
   min-width: 50%;
@@ -211,7 +193,6 @@ const UserBox = styled.div`
     hsla(0, 0%, 0%, 0.1) 0%,
     hsla(0, 0%, 50%, 0.1) 100%
   );
-  box-shadow: 6px 6px 7px hsla(0, 0%, 0%, 0.3);
   cursor: pointer;
   &:hover {
     background-color: hsla(0, 0%, 55%, 0.04);
@@ -224,9 +205,9 @@ const UserPopUp: FC<DivWrapper> = ({ callback, children, ...rest }) => {
 const UserPopUpWrapper = styled(UserPopUp)`
   position: absolute;
   justify-content: center;
-  bottom: 53px;
+  bottom: 95px;
   color: #fff;
-
+  width: calc(100% - 64px);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -244,13 +225,19 @@ const NavWrapper = styled.div`
   perspective: 1500px;
 `;
 const NavContainer = styled.div<NavContainerProps>`
-  font-size: 166%;
+  font-size: 145%;
+  padding: 2rem;
+  background: linear-gradient(
+    -45deg,
+    hsla(0, 0%, 10%, 0.05) 0%,
+    hsla(0, 0%, 30%, 0.08) 100%
+  );
   transition: transform 0.4s;
   transition-delay: ${({ isOpen }) => (isOpen ? '0.4s' : '0.2s')};
   transform-origin: 50% 150%;
   transform: ${(props) =>
     props.isOpen
-      ? 'translateZ(-600px) rotateY(30deg) translateX(15%)'
+      ? 'translateZ(-400px) rotateY(10deg) translateX(15%)'
       : 'translateZ(-1500px)'};
 `;
 

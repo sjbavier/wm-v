@@ -77,6 +77,8 @@ declare interface ICategory {
 }
 
 declare interface DivWrapper extends React.HTMLAttributes<HTMLDivElement> {
+  // onClick?: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  props?: Props & React.ComponentPropsWithoutRef<'div'>; // to impersonate all the props of a button element and explicitly not forwarding its ref
   callback?: Function;
 }
 
