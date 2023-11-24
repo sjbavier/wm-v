@@ -45,7 +45,11 @@ const App: FC = () => {
       />
       <Container
         isOpen={isOpen}
-        className={classNames('absolute w-full h-full bg-wm_dk_blue-600')}
+        className={classNames(
+          `absolute w-full h-full drop-shadow-sm filter bg-wm_dk_blue-700 ${
+            isOpen ? 'brightness-50' : 'brightness-100'
+          }`
+        )}
       >
         {!loading && (
           <Routes>
@@ -154,14 +158,15 @@ const PerspectiveWrapper = styled.div`
   perspective: 1500px;
 `;
 const Container = styled.div<ContainerProps>`
-  background-color: linear-gradient(
+  /* background: linear-gradient(
     -45deg,
     hsla(0, 0%, 30%, 0.08) 0%,
     hsla(0, 0%, 10%, 0.08) 100%
-  );
+  ); */
   transition:
     transform 0.4s,
-    background-size 0.4s;
+    background-size 0.4s,
+    filter 1.4s;
   transform-origin: 50% 150%;
   transition-delay: ${({ isOpen }) => (isOpen ? '0.2s' : '0.4s')};
   transform: ${(props) =>

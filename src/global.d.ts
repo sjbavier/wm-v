@@ -126,15 +126,3 @@ declare interface IAuthContext extends IAuthState {
   fetchUser: any;
   dispatchAuth: any;
 }
-// declare module 'web' {
-//   export {
-//     TRequest,
-//     TLoginResponse,
-//     IBookmarks,
-//     ICategory,
-//     DivWrapper,
-//     TResponseReferencesStructure,
-//     TStructure,
-//     Graphic
-//   };
-// }

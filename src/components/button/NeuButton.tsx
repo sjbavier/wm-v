@@ -1,15 +1,29 @@
 import classNames from 'classnames';
-import { FC } from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
-
-// export const NeuButton: FC<DivWrapper> = ({ props, children, className }) => {
-//   return (
-//     <NeurButton className={classNames('text-zinc-50', className)} {...props}>
-//       {children}
-//     </NeurButton>
-//   );
-// };
-export const NeuButton = styled.div`
+interface NeuButtonProps {
+  className?: string;
+  props?: React.ComponentPropsWithoutRef<'div'>;
+  children?: ReactNode;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+}
+export const NeuButton = ({
+  props,
+  children,
+  className,
+  onClick
+}: NeuButtonProps) => {
+  return (
+    <NeurButton
+      className={classNames('text-zinc-50', className)}
+      onClick={onClick}
+      {...props}
+    >
+      {children}
+    </NeurButton>
+  );
+};
+const NeurButton = styled.div<NeuButtonProps>`
   font-size: 1.4em;
   padding: 0.4rem 0.8rem;
   border-radius: 0px;

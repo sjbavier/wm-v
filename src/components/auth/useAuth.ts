@@ -3,47 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useClient from '../../hooks/useClient';
 import { useSetNotifications } from '../../hooks/useNotifications';
 import { PERMISSION } from '../../lib/Permissions';
-import {
-  IAuthAction,
-  IAuthContext,
-  IAuthState,
-  TAuthResponse,
-  TRequest
-} from '../../global';
 import { AUTH_ACTION, VERBOSITY } from '../../constants/constants';
-// export type TAuthResponse = {
-//   userId: number;
-//   user: string;
-//   role: string;
-//   message: string;
-//   msg?: string;
-// };
-
-// export interface IAuthState {
-//   userId?: string;
-//   user?: string;
-//   scopes?: string[];
-//   token?: string;
-//   error?: string;
-//   loading?: boolean;
-// }
-
-// export interface IAuthAction {
-//   type: string;
-//   payload?: IAuthState;
-// }
-
-// export const enum AUTH_ACTION {
-//   LOGIN = 'LOGIN',
-//   LOGOUT = 'LOGOUT',
-//   FETCHING = 'FETCHING',
-//   ERROR = 'ERROR'
-// }
-
-// export interface IAuthContext extends IAuthState {
-//   fetchUser: any;
-//   dispatchAuth: any;
-// }
 
 export const initialState: IAuthState = {
   userId: undefined,
