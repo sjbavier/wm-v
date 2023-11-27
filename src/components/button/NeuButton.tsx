@@ -1,11 +1,12 @@
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-interface NeuButtonProps {
+interface NeuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
-  props?: React.ComponentPropsWithoutRef<'div'>;
+  props?: React.ComponentPropsWithoutRef<'button'>;
   children?: ReactNode;
-  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  loading?: boolean;
 }
 export const NeuButton = ({
   props,
@@ -23,8 +24,8 @@ export const NeuButton = ({
     </NeurButton>
   );
 };
-const NeurButton = styled.div<NeuButtonProps>`
-  font-size: 1.4em;
+const NeurButton = styled.button<NeuButtonProps>`
+  font-size: 1.2em;
   padding: 0.4rem 0.8rem;
   border-radius: 0px;
   border: transparent;

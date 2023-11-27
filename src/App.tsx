@@ -16,10 +16,12 @@ import classNames from 'classnames';
 // import GraphicsContainer from './views/GraphicsContainer';
 // import Reference from './views/Reference';
 import { Loader } from '@mantine/core';
-import { NeuButton } from './components/button/NeuButton';
 import NavButton from './components/button/NavButton';
+import { LoginContainer } from './views';
+import PrivateRoute from './components/auth/PrivateRoute';
+import ReferenceContainer from './views/ReferenceContainer';
 
-interface ContainerProps {
+interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
 }
 const App: FC = () => {
@@ -54,8 +56,8 @@ const App: FC = () => {
         {!loading && (
           <Routes>
             <Route path="/" element={<div>Home</div>} />
-            {/* <Route path="/login" element={<LoginForm />} />
-            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/login" element={<LoginContainer />} />
+            {/* <Route path="/signup" element={<SignupForm />} />
             <Route
               path="/bookmarks/page/:page/page_size/:pageSize"
               element={
@@ -66,15 +68,17 @@ const App: FC = () => {
                 </PrivateRoute>
               }
             />
-            <Route
+            */}
+
+            {/* <Route
               path="/reference"
               element={
                 <PrivateRoute>
-                  <Reference />
+                  <ReferenceContainer />
                 </PrivateRoute>
               }
-            />
-
+            /> */}
+            {/*
             <Route
               path="/graphics"
               element={

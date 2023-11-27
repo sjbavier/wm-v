@@ -2,8 +2,7 @@ import { useCallback, useReducer, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useClient from '../../hooks/useClient';
 import { useSetNotifications } from '../../hooks/useNotifications';
-import { PERMISSION } from '../../lib/Permissions';
-import { AUTH_ACTION, VERBOSITY } from '../../constants/constants';
+import { AUTH_ACTION, PERMISSION, VERBOSITY } from '../../constants/constants';
 
 export const initialState: IAuthState = {
   userId: undefined,
@@ -64,7 +63,7 @@ export const useAuth = () => {
     error: authError
   } = authState;
   const { setNotification } = useSetNotifications();
-  const { fetchMe, statusCode } = useClient(VERBOSITY.NORMAL);
+  const { fetchMe } = useClient(VERBOSITY.NORMAL);
   const navigate = useNavigate();
 
   // syncs redux token state to localstorage
@@ -94,10 +93,11 @@ export const useAuth = () => {
 
       fetchMe<TAuthResponse>(request)
         .then((response: TAuthResponse) => {
-          if (statusCode === 401) {
-            dispatchAuth({ type: AUTH_ACTION.LOGOUT });
-            navigate('/login');
-          }
+          // debugger;
+          // if (statusCode === 401) {
+          //   dispatchAuth({ type: AUTH_ACTION.LOGOUT });
+          //   navigate('/login');
+          // }
           if (response.user) {
             dispatchAuth({
               type: AUTH_ACTION.LOGIN,
@@ -127,7 +127,7 @@ export const useAuth = () => {
           });
         });
     }
-  }, [token, setNotification, fetchMe, statusCode, navigate]);
+  }, [token, setNotification, fetchMe, navigate]);
 
   useEffect(() => {
     let mounted = true;

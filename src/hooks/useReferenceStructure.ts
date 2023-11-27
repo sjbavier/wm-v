@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { VERBOSITY } from '../lib/constants';
-import { TRequest, TResponseReferenceStructure } from '../models/models';
 import useClient from './useClient';
+import { VERBOSITY } from '../constants/constants';
 
 export const useReferenceStructure = () => {
   const { fetchMe, loading, error } = useClient(VERBOSITY.NORMAL);

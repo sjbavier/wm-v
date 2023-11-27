@@ -1,16 +1,22 @@
-import { Spin } from 'antd';
-import { FC, useEffect, useState } from 'react';
+import { FC, ForwardedRef, forwardRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import {
+  Prism as SyntaxHighlighter,
+  SyntaxHighlighterProps
+} from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
-import { ReferenceNav } from '../../components/reference/ReferenceNav';
-import useClient from '../../hooks/useClient';
-import { useReferenceStructure } from '../../hooks/useReferenceStructure';
-import { VERBOSITY } from '../../lib/constants';
-import { TStructure } from '../../models/models';
+import { Loader } from '@mantine/core';
+import { ReferenceNav } from '../components/reference/ReferenceNav';
+import { useReferenceStructure } from '../hooks/useReferenceStructure';
+import useClient from '../hooks/useClient';
+import { VERBOSITY } from '../constants/constants';
 
-const Reference: FC = () => {
+// interface CustomSyntaxHighlighter extends SyntaxHighlighterProps {
+//     forwardRef?: ForwardedRef<HTMLElement>
+// }
+
+const ReferenceContainer: FC = () => {
   const { data, loading } = useReferenceStructure();
   const {
     fetchMe: fetchMarkdown,
@@ -43,7 +49,7 @@ const Reference: FC = () => {
     <div className="flex ">
       {loading && (
         <div className="h-screen flex items-center justify-center flex-1">
-          <Spin />
+          <Loader color="gray" type="bars" />
         </div>
       )}
       {data && codified && (
@@ -55,7 +61,7 @@ const Reference: FC = () => {
       )}
       {loadingMarkdown && (
         <div className="h-screen flex items-center justify-center flex-1">
-          <Spin />
+          <Loader color="gray" type="bars" />
         </div>
       )}
       {markdownContent && !loadingMarkdown && (
@@ -69,6 +75,7 @@ const Reference: FC = () => {
 
                 return !inline && match ? (
                   <SyntaxHighlighter
+                    key={crypto.randomUUID()}
                     children={String(children).replace(/\n$/, '')}
                     style={oneDark}
                     language={match[1] === 'sh' ? 'bash' : match[1]}
@@ -90,4 +97,7 @@ const Reference: FC = () => {
   );
 };
 
-export default Reference;
+// const CustomSyntaxHighlighter = forwardRef<HTMLElement, CustomSyntaxHighlighter> ({children, forwardRef, ...props}, ref) =>{
+//     return (<SyntaxHighlighter ref={forwardRef || ref} children={String(children).replace(/\n$/, '')} style={oneDark} {...props} />)
+// }
+export default ReferenceContainer;

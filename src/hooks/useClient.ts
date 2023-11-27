@@ -2,7 +2,6 @@ import { useCallback, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/auth/AuthContext';
 import { useHandleNotifications } from './useNotifications';
-import { IAuthContext, TRequest } from '../global';
 import { AUTH_ACTION } from '../constants/constants';
 
 // const apiErrors = {
@@ -18,7 +17,7 @@ export default function useClient(verbosity?: string) {
   const [error, setError] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [statusCode, setStatusCode] = useState<Number>(0);
+  // const [statusCode, setStatusCode] = useState<Number>(0);
 
   const navigate = useNavigate();
 
@@ -43,15 +42,21 @@ export default function useClient(verbosity?: string) {
       };
 
       return fetch(`${request.path}`, reqOptions).then((response) => {
+        console.log('resepon', response);
+        // debugger;
+        // if (response.status === 401) {
+        //   setError(true);
+        //   setSuccess(false);
+        //   setLoading(false);
+        //   // navigate('/login');
+        //   dispatchAuth({ type: AUTH_ACTION.LOGOUT });
+        //   return response.json() as Promise<T>;
+        // }
         if (!response.ok) {
           //   Error Notifications
-          if (statusCode === 401) {
-            dispatchAuth({ type: AUTH_ACTION.LOGOUT });
-            navigate('/login');
-          }
           setError(true);
+          setSuccess(false);
           setLoading(false);
-          setStatusCode(response.status);
           handleResponse({ response, verbosity });
           return response.json() as Promise<T>;
         } else {
@@ -63,15 +68,19 @@ export default function useClient(verbosity?: string) {
           return response.json() as Promise<T>;
         }
       });
+      // .catch((_) => {
+      //   setSuccess(false);
+      //   setLoading(false);
+      //   setError(true);
+      // });
     },
-    [token, verbosity, handleResponse, dispatchAuth, navigate, statusCode]
+    [token, verbosity, handleResponse, dispatchAuth, navigate]
   );
 
   return {
     fetchMe,
     loading,
     error,
-    success,
-    statusCode
+    success
   };
 }

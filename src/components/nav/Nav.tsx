@@ -1,6 +1,5 @@
 import { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@mantine/core';
 import { AuthContext } from '../auth/AuthContext';
 import webmaneLogo from '../../assets/LionHeadLOGO.svg';
 
@@ -10,7 +9,12 @@ import { AUTH_ACTION } from '../../constants/constants';
 import { Color } from '../color/Color';
 import { NeuButton } from '../button/NeuButton';
 import {
+  IconAdjustmentsFilled,
+  IconBook2,
+  IconBooks,
   IconHomeHeart,
+  IconSlideshow,
+  IconUserCancel,
   IconUserCircle,
   IconUserFilled,
   IconUserQuestion
@@ -38,12 +42,12 @@ const Nav: FC<NavProps> = ({
   const [popUp, setPopUp] = useState<boolean>(false);
   const [settings, setSettings] = useState<boolean>(false);
 
-  const logout = (_ev: React.MouseEvent<HTMLDivElement>) => {
+  const logout = () => {
     dispatchAuth({ type: AUTH_ACTION.LOGOUT });
     navigate('');
   };
 
-  const handleAvatarClick = (_ev: React.MouseEvent<HTMLDivElement>): void => {
+  const handleAvatarClick = (): void => {
     setPopUp(!popUp);
   };
 
@@ -64,13 +68,13 @@ const Nav: FC<NavProps> = ({
             onClick={() => navigate('')}
           >
             <img
-              className="w-full pt-6 pb-1"
+              className="w-full pt-1 pb-1"
               src={webmaneLogo}
               alt="Webmane logo"
               style={{ maxWidth: 'calc(200px / 3)' }}
             />
           </div>
-          <h1 className="text-zinc-50 text-center tracking-widest text-xs uppercase ">
+          <h1 className="text-zinc-50 text-center tracking-widest text-xs uppercase -mt-10 mb-8 ">
             webmane
           </h1>
           <div className="grow ">
@@ -85,21 +89,24 @@ const Nav: FC<NavProps> = ({
               <>
                 <NeuButton
                   onClick={() => navigate('/bookmarks/page/1/page_size/10')}
-                  className="w-full flex items-center "
+                  className="mt-5 w-full flex items-center justify-end"
                 >
                   bookmarks
+                  <IconBook2 className="ml-4" />
                 </NeuButton>{' '}
                 <NeuButton
                   onClick={() => navigate('/reference')}
-                  className="w-full flex items-center "
+                  className="mt-5 w-full flex items-center justify-end"
                 >
                   reference
+                  <IconBooks className="ml-4" />
                 </NeuButton>
                 <NeuButton
                   onClick={() => navigate('/graphics')}
-                  className="w-full flex items-center "
+                  className="mt-5 w-full flex items-center justify-end"
                 >
                   Graphics
+                  <IconSlideshow className="ml-4" />
                 </NeuButton>
               </>
             )}
@@ -117,11 +124,14 @@ const Nav: FC<NavProps> = ({
                     setColor={setColor}
                   />
                   <UserItem onClick={logout}>
-                    <div>user</div>
+                    <IconUserCancel />
                     <div>Logout</div>
                   </UserItem>
                   <UserItem onClick={handleSettingsClick}>
-                    <div onClick={handleSettingsClick}>settings</div>
+                    <div onClick={handleSettingsClick}>
+                      <IconAdjustmentsFilled />
+                    </div>
+
                     <div>Settings</div>
                   </UserItem>
                 </>
