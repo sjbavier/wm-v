@@ -20,6 +20,7 @@ import {
   IconUserQuestion
 } from '@tabler/icons-react';
 import { IconUserPlus } from '@tabler/icons-react';
+import Render from '../render/Render';
 
 interface NavProps {
   isOpen: boolean | (() => void);
@@ -85,7 +86,7 @@ const Nav: FC<NavProps> = ({
               home
               <IconHomeHeart className="ml-4" />
             </NeuButton>
-            {!!user && (
+            <Render if={!!user}>
               <>
                 <NeuButton
                   onClick={() => navigate('/bookmarks/page/1/page_size/10')}
@@ -109,14 +110,14 @@ const Nav: FC<NavProps> = ({
                   <IconSlideshow className="ml-4" />
                 </NeuButton>
               </>
-            )}
+            </Render>
           </div>
 
           <UserBox>
             <UserPopUpWrapper
               className={classNames(popUp ? '' : 'invisible collapsed hidden')}
             >
-              {!!user && (
+              <Render if={!!user}>
                 <>
                   <Color
                     className={settings ? '' : 'invisible collapsed hidden'}
@@ -135,8 +136,9 @@ const Nav: FC<NavProps> = ({
                     <div>Settings</div>
                   </UserItem>
                 </>
-              )}
-              {!user && (
+              </Render>
+
+              <Render if={!user}>
                 <>
                   <UserItem onClick={() => navigate('/login')}>
                     <IconUserCircle />
@@ -147,19 +149,21 @@ const Nav: FC<NavProps> = ({
                     <div>Signup</div>
                   </UserItem>
                 </>
-              )}
+              </Render>
             </UserPopUpWrapper>
             <NeuButton
               className=" w-full items-center inline-flex justify-center"
               onClick={handleAvatarClick}
             >
               <UserAvatar />
-              {user ? (
+              <Render if={!!user}>
                 <IconUserFilled className="mr-4" />
-              ) : (
+                {user}
+              </Render>
+              <Render if={!user}>
                 <IconUserQuestion className="mr-4" />
-              )}
-              {user ? user : 'unknown'}
+                <div>'unknown</div>
+              </Render>
             </NeuButton>
           </UserBox>
         </NavContainer>

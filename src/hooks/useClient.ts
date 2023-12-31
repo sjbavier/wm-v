@@ -2,7 +2,6 @@ import { useCallback, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../components/auth/AuthContext';
 import { useHandleNotifications } from './useNotifications';
-import { AUTH_ACTION } from '../constants/constants';
 
 // const apiErrors = {
 //     401: 'Unauthorized',
@@ -12,6 +11,15 @@ import { AUTH_ACTION } from '../constants/constants';
 //     422: 'Token is malformed',
 //     500: 'Server error'
 // }
+
+export const safeJson = async (res: string) => {
+  try {
+    const decoded = JSON.parse(res);
+    return decoded;
+  } catch (err) {
+    console.log('error to be replaced with global error handler', err);
+  }
+};
 
 export default function useClient(verbosity?: string) {
   const [error, setError] = useState<boolean>(false);

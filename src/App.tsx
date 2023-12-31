@@ -70,14 +70,14 @@ const App: FC = () => {
             />
             */}
 
-            {/* <Route
+            <Route
               path="/reference"
               element={
                 <PrivateRoute>
                   <ReferenceContainer />
                 </PrivateRoute>
               }
-            /> */}
+            />
             {/*
             <Route
               path="/graphics"

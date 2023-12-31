@@ -1,15 +1,15 @@
 import { FC, ForwardedRef, forwardRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
-  Prism as SyntaxHighlighter,
-  SyntaxHighlighterProps
+  Prism as SyntaxHighlighter
+  // SyntaxHighlighterProps
 } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { Loader } from '@mantine/core';
 import { ReferenceNav } from '../components/reference/ReferenceNav';
 import { useReferenceStructure } from '../hooks/useReferenceStructure';
-import useClient from '../hooks/useClient';
+import useClient, { safeJson } from '../hooks/useClient';
 import { VERBOSITY } from '../constants/constants';
 
 // interface CustomSyntaxHighlighter extends SyntaxHighlighterProps {
@@ -34,7 +34,8 @@ const ReferenceContainer: FC = () => {
   useEffect(() => {
     let mounted = true;
     const convertCodified = async () => {
-      const dataObj = await JSON.parse(data?.structure || '');
+      // const dataObj = await JSON.parse(data?.structure || '');
+      const dataObj = await safeJson(data?.structure || '');
       if (mounted) {
         setcodified(dataObj);
       }
@@ -70,10 +71,10 @@ const ReferenceContainer: FC = () => {
             children={markdownContent}
             remarkPlugins={[remarkGfm]}
             components={{
-              code({ node, inline, className, children, style, ...props }) {
+              code({ node, className, children, style, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
 
-                return !inline && match ? (
+                return match ? (
                   <SyntaxHighlighter
                     key={crypto.randomUUID()}
                     children={String(children).replace(/\n$/, '')}

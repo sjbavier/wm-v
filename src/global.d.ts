@@ -140,3 +140,10 @@ declare interface IAuthContext extends IAuthState {
   fetchUser: any;
   dispatchAuth: any;
 }
+
+declare type FileNode = {
+  type?: 'directory' | 'file' | 'hidden';
+  name: string;
+  path: string;
+  children?: FileNode[];
+};
