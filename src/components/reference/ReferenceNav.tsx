@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { IReferenceData, IReferenceNavProps } from './models';
 import Render from '../render/Render';
+import { useToggle } from '../../hooks/useToggle';
+import {
+  IconChevronRight,
+  IconCode,
+  IconFolderCode,
+  IconMarkdown
+} from '@tabler/icons-react';
 
 export const ReferenceNav = ({
   fetchMarkdown,
@@ -60,25 +67,21 @@ export const ReferenceNav = ({
     };
   }, [codified]);
 
-  // const onSelect = async (info) => {
-  //   const pathname = info.node.key.toString();
-  //   const request: TRequest = {
-  //     method: 'GET',
-  //     path: `/api/reference/path?name=${pathname}`
-  //   };
-  //   const extension = pathname.match(/\.[0-9a-z]+$/i);
-  //   if (extension) {
-  //     const data: IReferenceData = await fetchMarkdown(request);
-  //     data.data.content
-  //       ? setMarkdownContent(data?.data?.content)
-  //       : setMarkdownContent(null);
-  //   }
-  // };
+  const onSelect = async (path) => {
+    const request: TRequest = {
+      method: 'GET',
+      path: `/api/reference/path?name=${path}`
+    };
+    const data: IReferenceData = await fetchMarkdown(request);
+    data.data.content
+      ? setMarkdownContent(data?.data?.content)
+      : setMarkdownContent(null);
+  };
   console.log('nav codified', codified);
   console.log('nav data', nav);
 
   return (
-    <div className="overflow-y-auto min-w-fit h-screen pt-8 pb-8">
+    <div className="overflow-y-auto min-w-fit h-screen py-8 pl-10 text-zinc-300">
       {nav.map((item) => (
         <FileNode item={item} key={crypto.randomUUID()} />
       ))}
@@ -91,16 +94,38 @@ const FileNode = ({
 }: {
   item: FileNode;
 }) => {
+  const [isOpen, toggleIsOpen] = useToggle(false);
+  const extension = path.match(/\.([^.]+)$/)?.[1]; // Extracts the extension
   return (
     <div className="relative">
-      <div className="inline-flex">
-        {children && '>'}
+      <div
+        className="inline-flex"
+        onClick={async () => {
+          if (!!children) {
+            toggleIsOpen();
+            return;
+          }
+          onSelect(path);
+        }}
+      >
+        <Render if={!!children}>
+          <IconChevronRight />
+          <IconFolderCode className="mr-1" />
+        </Render>
+        <Render if={!!extension && extension === 'md'}>
+          <IconMarkdown className="mr-1" />
+        </Render>
+        <Render if={!!extension && extension !== 'md'}>
+          <IconCode className="mr-1" />
+        </Render>
         <div>{name}</div>
       </div>
-      <Render if={Array.isArray(children)}>
-        {children?.map((item) => (
-          <FileNode item={item} key={crypto.randomUUID()} />
-        ))}
+      <Render if={Array.isArray(children) && isOpen}>
+        <div className="mx-6">
+          {children?.map((item) => (
+            <FileNode item={item} key={crypto.randomUUID()} />
+          ))}
+        </div>
       </Render>
     </div>
   );

@@ -162,7 +162,7 @@ const Nav: FC<NavProps> = ({
               </Render>
               <Render if={!user}>
                 <IconUserQuestion className="mr-4" />
-                <div>'unknown</div>
+                <div>unknown</div>
               </Render>
             </NeuButton>
           </UserBox>

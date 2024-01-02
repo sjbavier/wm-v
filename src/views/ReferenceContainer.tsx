@@ -17,34 +17,43 @@ import { VERBOSITY } from '../constants/constants';
 // }
 
 const ReferenceContainer: FC = () => {
-  const { data, loading } = useReferenceStructure();
   const {
-    fetchMe: fetchMarkdown,
-    loading: loadingMarkdown
-    // error: errorMarkdown
-  } = useClient(VERBOSITY.SILENT);
+    data,
+    loading,
+    error,
+    fetchMarkdown,
+    loadingMarkdown,
+    markdownContent,
+    setMarkdownContent,
+    codified
+  } = useReferenceStructure();
+  // const {
+  //   fetchMe: fetchMarkdown,
+  //   loading: loadingMarkdown
+  //   // error: errorMarkdown
+  // } = useClient(VERBOSITY.SILENT);
 
-  const [markdownContent, setMarkdownContent] = useState<string | null>(null);
-  const [codified, setcodified] = useState<TStructure>({
-    name: '',
-    path: '',
-    type: 'directory'
-  });
+  // const [markdownContent, setMarkdownContent] = useState<string | null>(null);
+  // const [codified, setcodified] = useState<TStructure>({
+  //   name: '',
+  //   path: '',
+  //   type: 'directory'
+  // });
 
-  useEffect(() => {
-    let mounted = true;
-    const convertCodified = async () => {
-      // const dataObj = await JSON.parse(data?.structure || '');
-      const dataObj = await safeJson(data?.structure || '');
-      if (mounted) {
-        setcodified(dataObj);
-      }
-    };
-    convertCodified();
-    return () => {
-      mounted = false;
-    };
-  }, [data?.structure]);
+  // useEffect(() => {
+  //   let mounted = true;
+  //   const convertCodified = async () => {
+  //     // const dataObj = await JSON.parse(data?.structure || '');
+  //     const dataObj = await safeJson(data?.structure || '');
+  //     if (mounted) {
+  //       setcodified(dataObj);
+  //     }
+  //   };
+  //   convertCodified();
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [data?.structure]);
 
   return (
     <div className="flex ">
