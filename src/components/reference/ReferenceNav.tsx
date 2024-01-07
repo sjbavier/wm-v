@@ -67,7 +67,7 @@ export const ReferenceNav = ({
     };
   }, [codified]);
 
-  const onSelect = async (path) => {
+  const onSelect = async (path: string) => {
     const request: TRequest = {
       method: 'GET',
       path: `/api/reference/path?name=${path}`
@@ -83,21 +83,23 @@ export const ReferenceNav = ({
   return (
     <div className="overflow-y-auto min-w-fit h-screen py-8 pl-10 text-zinc-300">
       {nav.map((item) => (
-        <FileNode item={item} key={crypto.randomUUID()} />
+        <FileNode onSelect={onSelect} item={item} key={crypto.randomUUID()} />
       ))}
     </div>
   );
 };
 
 const FileNode = ({
-  item: { type, name, path, children }
+  item: { type, name, path, children },
+  onSelect
 }: {
   item: FileNode;
+  onSelect: (path: string) => Promise<void>;
 }) => {
   const [isOpen, toggleIsOpen] = useToggle(false);
   const extension = path.match(/\.([^.]+)$/)?.[1]; // Extracts the extension
   return (
-    <div className="relative">
+    <div className="relative cursor-pointer">
       <div
         className="inline-flex"
         onClick={async () => {
@@ -123,7 +125,11 @@ const FileNode = ({
       <Render if={Array.isArray(children) && isOpen}>
         <div className="mx-6">
           {children?.map((item) => (
-            <FileNode item={item} key={crypto.randomUUID()} />
+            <FileNode
+              onSelect={onSelect}
+              item={item}
+              key={crypto.randomUUID()}
+            />
           ))}
         </div>
       </Render>

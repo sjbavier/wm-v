@@ -75,12 +75,12 @@ const ReferenceContainer: FC = () => {
         </div>
       )}
       {markdownContent && !loadingMarkdown && (
-        <div className="h-screen overflow-auto p-8 flex-1">
+        <div className="h-screen overflow-auto p-8 flex-1 text-zinc-50">
           <ReactMarkdown
             children={markdownContent}
             remarkPlugins={[remarkGfm]}
             components={{
-              code({ node, className, children, style, ...props }) {
+              code({ className, children }) {
                 const match = /language-(\w+)/.exec(className || '');
 
                 return match ? (
@@ -91,12 +91,9 @@ const ReferenceContainer: FC = () => {
                     language={match[1] === 'sh' ? 'bash' : match[1]}
                     PreTag="div"
                     wrapLongLines
-                    {...props}
                   />
                 ) : (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
+                  <code className={className}>{children}</code>
                 );
               }
             }}
