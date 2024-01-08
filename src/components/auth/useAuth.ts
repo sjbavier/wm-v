@@ -8,7 +8,7 @@ export const initialState: IAuthState = {
   userId: undefined,
   user: undefined,
   scopes: undefined,
-  token: localStorage.getItem('token')?.toString() || '',
+  token: sessionStorage.getItem('token')?.toString() || '',
   error: undefined,
   loading: false
 };
@@ -70,7 +70,8 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
     const setLocalToken = (token: string) => {
-      localStorage.setItem('token', token);
+      // localStorage.setItem('token', token);
+      sessionStorage.setItem('token', token);
     };
 
     if (mounted) {

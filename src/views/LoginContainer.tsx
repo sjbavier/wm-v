@@ -11,8 +11,6 @@ import webmaneLogo from '../assets/LionHeadLOGO.svg';
 import { AuthContext } from '../components/auth/AuthContext';
 
 const Login: FC = () => {
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const { dispatchAuth, token } = useContext<IAuthContext>(AuthContext);
@@ -26,14 +24,6 @@ const Login: FC = () => {
     },
     validate: {}
   });
-
-  // const onEmailChange = (ev: any): void => {
-  //   setEmail(ev.target.value);
-  // };
-
-  // const onPasswordChange = (ev: any): void => {
-  //   setPassword(ev.target.value);
-  // };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,11 +68,7 @@ const Login: FC = () => {
 
   if (token && !loading) {
     let redirect: string | null = redirectTo.get('redirectTo');
-    return redirect ? (
-      <Navigate to={redirect} />
-    ) : (
-      <Navigate to="/bookmarks/page/1/page_size/10" />
-    );
+    return redirect ? <Navigate to={redirect} /> : <Navigate to="/reference" />;
   } else {
     return (
       <div className="flex flex-col flex-nowrap justify-center items-center h-screen">
