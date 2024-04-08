@@ -4,11 +4,11 @@ import { FC, useState, useContext } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { NeuButton } from '../components/button/NeuButton';
-import { AUTH_ACTION, PERMISSION } from '../constants/constants';
-import useClient from '../hooks/useClient';
-import webmaneLogo from '../assets/LionHeadLOGO.svg';
-import { AuthContext } from '../components/auth/AuthContext';
+import { NeuButton } from '../../components/button/NeuButton';
+import { AUTH_ACTION, PERMISSION } from '../../constants/constants';
+import useClient from '../../hooks/useClient';
+import webmaneLogo from '../../assets/LionHeadLOGO.svg';
+import { AuthContext } from '../../components/auth/AuthContext';
 
 const Login: FC = () => {
   const [msg, setMsg] = useState('');

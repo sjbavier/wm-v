@@ -30,7 +30,7 @@ interface NavProps {
 }
 
 interface NavContainerProps {
-  isOpen: boolean | (() => void);
+  $isOpen: boolean | (() => void);
 }
 const Nav: FC<NavProps> = ({
   // toggleIsOpen,
@@ -63,7 +63,7 @@ const Nav: FC<NavProps> = ({
           'flex h-screen flex-col flex-wrap transition-all duration-150 fixed w-[33%]'
         )}
       >
-        <NavContainer isOpen={isOpen} className="flex flex-col h-full">
+        <NavContainer $isOpen={isOpen} className="flex flex-col h-full">
           <div
             className="flex justify-center items-center cursor-pointer"
             onClick={() => navigate('')}
@@ -84,6 +84,13 @@ const Nav: FC<NavProps> = ({
               className="mt-5 w-full flex items-center justify-end"
             >
               home
+              <IconHomeHeart className="ml-4" />
+            </NeuButton>
+            <NeuButton
+              onClick={() => navigate('/music')}
+              className="mt-5 w-full flex items-center justify-end"
+            >
+              music
               <IconHomeHeart className="ml-4" />
             </NeuButton>
             <Render if={!!user}>
@@ -239,10 +246,10 @@ const NavContainer = styled.div<NavContainerProps>`
     hsla(0, 0%, 30%, 0.08) 100%
   );
   transition: transform 0.4s;
-  transition-delay: ${({ isOpen }) => (isOpen ? '0.4s' : '0.2s')};
+  transition-delay: ${({ $isOpen }) => ($isOpen ? '0.4s' : '0.2s')};
   transform-origin: 50% 150%;
   transform: ${(props) =>
-    props.isOpen
+    props.$isOpen
       ? 'translateZ(-400px) rotateY(10deg) translateX(15%)'
       : 'translateZ(-1500px)'};
 `;

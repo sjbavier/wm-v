@@ -7,10 +7,10 @@ import {
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { Loader } from '@mantine/core';
-import { ReferenceNav } from '../components/reference/ReferenceNav';
-import { useReferenceStructure } from '../hooks/useReferenceStructure';
-import useClient, { safeJson } from '../hooks/useClient';
-import { VERBOSITY } from '../constants/constants';
+import { ReferenceNav } from '../../components/reference/ReferenceNav';
+import { useReferenceStructure } from '../../hooks/useReferenceStructure';
+import useClient, { safeJson } from '../../hooks/useClient';
+import { VERBOSITY } from '../../constants/constants';
 
 // interface CustomSyntaxHighlighter extends SyntaxHighlighterProps {
 //     forwardRef?: ForwardedRef<HTMLElement>
