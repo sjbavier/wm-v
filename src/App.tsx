@@ -58,6 +58,7 @@ const Container = styled.div<ContainerProps>`
     background-size 0.4s,
     filter 1.4s;
   cursor: ${({ $isOpen }) => ($isOpen ? 'pointer' : '')};
+  overflow: scroll;
   transform-origin: 50% 150%;
   transition-delay: ${({ $isOpen }) => ($isOpen ? '0.2s' : '0.4s')};
   transform: ${(props) =>

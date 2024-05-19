@@ -7,21 +7,28 @@ import { AuthProvider } from './components/auth/AuthProvider.tsx';
 import App from './App.tsx';
 
 import { MantineProvider } from '@mantine/core';
+import { ApolloProvider } from '@apollo/client';
+import { createApolloClient } from './lib/ApolloClient.ts';
 // import { MantineConfig } from './mantine.config.ts';
 
 // import { useToggle } from './hooks/useToggle.ts';
 // const [isDark, toggleDark] = useToggle(false);
 // const schema: string = isDark ? 'dark' : 'light';
+const client = createApolloClient({
+  uri: `${import.meta.env.VITE_GO_API}query`
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Router>
       <AuthProvider>
-        <MantineProvider
-        // theme={{ colorScheme: schema }}
-        >
-          <App />
-        </MantineProvider>
+        <ApolloProvider client={client}>
+          <MantineProvider
+          // theme={{ colorScheme: schema }}
+          >
+            <App />
+          </MantineProvider>
+        </ApolloProvider>
       </AuthProvider>
     </Router>
   </React.StrictMode>

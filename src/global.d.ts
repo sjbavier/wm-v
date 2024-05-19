@@ -147,3 +147,14 @@ declare type FileNode = {
   path: string;
   children?: FileNode[];
 };
+
+declare type Song = {
+  id?: Number;
+  path?: string;
+  lastUpdate?: string;
+  title?: string;
+  artist?: string;
+  album?: string;
+  genre?: string;
+  release_year?: string;
+};

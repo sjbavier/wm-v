@@ -11,11 +11,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mantine/core": "^7.1.7",
-    "@mantine/form": "^7.1.7",
-    "@mantine/hooks": "^7.1.7",
+    "@mantine/core": "^7.9.2",
+    "@mantine/form": "^7.9.2",
+    "@mantine/hooks": "^7.9.2",
     "@tabler/icons-react": "^2.42.0",
     "classnames": "^2.3.2",
+    "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-colorful": "^5.6.1",
     "react-dom": "^18.2.0",
@@ -27,6 +28,7 @@
     "styled-components": "^6.1.0"
   },
   "devDependencies": {
+    "@apollo/client": "^3.10.4",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@types/react-syntax-highlighter": "^15.5.10",
