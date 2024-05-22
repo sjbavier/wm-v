@@ -87,7 +87,7 @@ const Nav: FC<NavProps> = ({
               <IconHomeHeart className="ml-4" />
             </NeuButton>
             <NeuButton
-              onClick={() => navigate('/music')}
+              onClick={() => navigate('/music_player')}
               className="mt-5 w-full flex items-center justify-end"
             >
               music

@@ -6,7 +6,7 @@ const WMRoutes = () => {
     <Routes>
       <Route path="/" element={<div>Home</div>} />
       <Route path="/login" element={<LoginContainer />} />
-      <Route path="/music" element={<MusicContainer />} />
+      <Route path="/music_player" element={<MusicContainer />} />
       {/* <Route path="/signup" element={<SignupForm />} />
             <Route
               path="/bookmarks/page/:page/page_size/:pageSize"

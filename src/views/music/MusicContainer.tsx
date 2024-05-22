@@ -3,6 +3,7 @@ import useMusic from '../../hooks/useMusic';
 import { Alert, Loader, Text } from '@mantine/core';
 import Render from '../../components/render/Render';
 import { useMemo, useState } from 'react';
+import PaginationContainer from '../../components/pagination/Pagination';
 
 const MusicContainer = () => {
   const [musicId, setMusicId] = useState<Number | undefined>(1);
@@ -11,13 +12,27 @@ const MusicContainer = () => {
     return `${baseUrl}music?id=${musicId}`;
   }, [musicId]);
   console.log('musicSrc', musicSrc);
+  const [pageSize, setPageSize] = useState(20);
+  const [page, setPage] = useState(0);
 
-  const { data, errors, loading } = useMusic({ skip: false });
+  const {
+    data,
+    errors,
+    loading,
+    totalItemsCount,
+    totalPageCount: pageCount
+  } = useMusic({
+    pageSize,
+    pageNumber: page,
+    skip: false
+  });
   return (
     <AudioContainer>
-      <audio src={musicSrc} controls>
-        doesn't work
-      </audio>
+      <AudioPlayerContainer>
+        <AudioPlayer src={musicSrc} controls>
+          doesn't work
+        </AudioPlayer>
+      </AudioPlayerContainer>
       <Render
         if={
           Array.isArray(errors) &&
@@ -50,12 +65,40 @@ const MusicContainer = () => {
             </SongRow>
           );
         })}
+        <PaginationContainer
+          pageCount={pageCount}
+          setPageSize={setPageSize}
+          pageSize={pageSize}
+          totalItemsCount={totalItemsCount}
+          page={page}
+          setPage={setPage}
+          clearSelected={() => {}}
+        />
       </Render>
     </AudioContainer>
   );
 };
 
-const AudioContainer = styled.div``;
+const AudioContainer = styled.div`
+  background-image: linear-gradient(
+    to right top,
+    #051937,
+    #004d7a,
+    #008793,
+    #00bf72,
+    #a8eb12
+  );
+`;
+
+const AudioPlayerContainer = styled.div`
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20rem;
+`;
+
+const AudioPlayer = styled.audio``;
 const SongRow = styled.div`
   display: flex;
   direction: row;
