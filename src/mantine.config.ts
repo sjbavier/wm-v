@@ -1,15 +1,11 @@
-import { MantineTheme } from '@mantine/core';
+import { createTheme } from '@mantine/core';
 import { colors } from './colors.config';
 
-export const MantineConfig: MantineTheme = {
+export const customTheme = createTheme({
   /**
    * Fonts
    */
-  // fontFamily: 'Sailec, sans-serif',
-  // fontFamilyMonospace: 'Monaco, Courier, monospace',
-  // headings: {
-  //   fontFamily: 'SailecBold'
-  // },
+  fontFamily: 'Hind Siliguri, sans-serif',
   /**
    * Colors
    */
@@ -87,4 +83,4 @@ export const MantineConfig: MantineTheme = {
       colors.wm_lt_grey[900]
     ]
   }
-};
+});

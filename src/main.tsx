@@ -9,7 +9,7 @@ import App from './App.tsx';
 import { MantineProvider } from '@mantine/core';
 import { ApolloProvider } from '@apollo/client';
 import { createApolloClient } from './lib/ApolloClient.ts';
-// import { MantineConfig } from './mantine.config.ts';
+import { customTheme } from './mantine.config.ts';
 
 // import { useToggle } from './hooks/useToggle.ts';
 // const [isDark, toggleDark] = useToggle(false);
@@ -23,9 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Router>
       <AuthProvider>
         <ApolloProvider client={client}>
-          <MantineProvider
-          // theme={{ colorScheme: schema }}
-          >
+          <MantineProvider theme={customTheme}>
             <App />
           </MantineProvider>
         </ApolloProvider>

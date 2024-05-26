@@ -4,6 +4,7 @@ import { Alert, Loader, Text } from '@mantine/core';
 import Render from '../../components/render/Render';
 import { useMemo, useState } from 'react';
 import PaginationContainer from '../../components/pagination/Pagination';
+import MusicGrid from '../../components/music_grid/MusicGrid';
 
 const MusicContainer = () => {
   const [musicId, setMusicId] = useState<Number | undefined>(1);
@@ -12,7 +13,7 @@ const MusicContainer = () => {
     return `${baseUrl}music?id=${musicId}`;
   }, [musicId]);
   console.log('musicSrc', musicSrc);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
   const {
@@ -28,11 +29,13 @@ const MusicContainer = () => {
   });
   return (
     <AudioContainer>
+      {/* audio player */}
       <AudioPlayerContainer>
         <AudioPlayer src={musicSrc} controls>
           doesn't work
         </AudioPlayer>
       </AudioPlayerContainer>
+      {/* error  */}
       <Render
         if={
           Array.isArray(errors) &&
@@ -48,33 +51,21 @@ const MusicContainer = () => {
           ))}
         </Alert>
       </Render>
+      {/* loader  */}
       <Render if={loading}>
         <Loader />
       </Render>
-      <Render if={Array.isArray(data) && data.length > 0}>
-        {data?.map((s: Song) => {
-          return (
-            <SongRow
-              onClick={() => setMusicId(s?.id)}
-              key={crypto.randomUUID()}
-            >
-              <SongInfoChunk>
-                {s?.title ? s.title : s?.path?.split('/')[2]}
-              </SongInfoChunk>
-              <SongInfoChunk>{s?.genre ? s.genre : 'None'}</SongInfoChunk>
-            </SongRow>
-          );
-        })}
-        <PaginationContainer
-          pageCount={pageCount}
-          setPageSize={setPageSize}
-          pageSize={pageSize}
-          totalItemsCount={totalItemsCount}
-          page={page}
-          setPage={setPage}
-          clearSelected={() => {}}
-        />
-      </Render>
+      <PaginationContainer
+        pageCount={pageCount || 1}
+        setPageSize={setPageSize}
+        pageSize={pageSize}
+        totalItemsCount={totalItemsCount}
+        page={page}
+        setPage={setPage}
+        clearSelected={() => {}}
+      />
+      {/* music list  */}
+      <MusicGrid data={data} setMusicId={setMusicId} />
     </AudioContainer>
   );
 };
@@ -82,12 +73,14 @@ const MusicContainer = () => {
 const AudioContainer = styled.div`
   background-image: linear-gradient(
     to right top,
-    #051937,
-    #004d7a,
-    #008793,
-    #00bf72,
-    #a8eb12
+    rgb(5 25 55 / 24%),
+    rgb(0 77 122 / 32%),
+    rgb(0 135 147 / 28%),
+    rgb(0 191 114 / 31%),
+    rgb(168 235 18 / 26%)
   );
+  margin-left: 48px;
+  min-height: 100%;
 `;
 
 const AudioPlayerContainer = styled.div`
@@ -95,20 +88,8 @@ const AudioPlayerContainer = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  height: 20rem;
+  /* height: 20rem; */
 `;
 
 const AudioPlayer = styled.audio``;
-const SongRow = styled.div`
-  display: flex;
-  direction: row;
-  flex-wrap: nowrap;
-  width: 100%;
-  cursor: pointer;
-`;
-const SongInfoChunk = styled.div`
-  border: 1px solid #fff;
-  color: #fff;
-  padding: 1rem;
-`;
 export default MusicContainer;

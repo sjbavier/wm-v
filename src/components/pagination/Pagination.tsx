@@ -1,4 +1,4 @@
-import { Input } from '@mantine/core';
+import { Input, Select } from '@mantine/core';
 import ReactPaginate from 'react-paginate';
 import styled from 'styled-components';
 
@@ -28,8 +28,8 @@ const PaginationContainer = ({
     const startItem = totalItemsCount !== 0 ? page * pageSize + 1 : 0;
     return (
       <div className="data-info">
-        Showing <strong>{startItem}</strong> - <strong>{endItem}</strong> of{' '}
-        <strong>{totalItemsCount.toString()}</strong>
+        <strong>{startItem}</strong> - <strong>{endItem}</strong> of{' '}
+        <strong>{totalItemsCount?.toString()}</strong>
       </div>
     );
   };
@@ -86,24 +86,17 @@ const PageSizeOptions = ({
   const sizeOptions = [10, 20, 50, 100, 200];
   return (
     <div className="data-grid-page-size">
-      <label>Page Size </label>
-      <Input
-        type="select"
-        value={pageSize}
+      <Select
+        value={pageSize.toString()}
         onChange={(e) => {
-          setPageSize(parseInt(e.target.value));
+          setPageSize(e ? parseInt(e) : 0);
           setPage && setPage(0); // testing for pagination bug
           clearSelected && clearSelected();
         }}
-      >
-        {sizeOptions.map((item) => {
-          return (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          );
-        })}
-      </Input>
+        data={sizeOptions.map((s) => s.toString())}
+        checkIconPosition="right"
+        color="white"
+      />
     </div>
   );
 };
@@ -121,7 +114,7 @@ const ReactPaginateContainer = styled.div`
 
   .data-info {
     grid-area: info;
-    color: rgb(127, 136, 153);
+    color: rgba(255, 255, 255, 0.88);
     font-weight: 500;
   }
 
@@ -129,17 +122,42 @@ const ReactPaginateContainer = styled.div`
     grid-area: pagination;
     margin-bottom: 0 !important;
     margin-inline: auto;
+    display: inline-flex;
+    align-items: center;
     li {
-      margin-inline: 0 !important;
+      &.active {
+        a {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+      a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        margin-inline: 0.4rem;
+        border-radius: 50%;
+        color: rgba(255, 255, 255, 0.88);
+        font-weight: 700;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+      margin-top: 0;
+      list-style: none;
     }
   }
 
   .data-grid-page-size {
     grid-area: size;
+    color: rgba(255, 255, 255, 0.88);
     display: flex;
     white-space: nowrap;
     align-items: center;
     gap: 0.5rem;
+    margin-left: auto;
   }
   @media screen and (max-width: 1023px) {
     grid-template-columns: auto auto;
