@@ -2,6 +2,8 @@ import { Input, Select } from '@mantine/core';
 import ReactPaginate from 'react-paginate';
 import styled from 'styled-components';
 
+import './Pagination.css';
+
 interface PaginationContainerProps {
   pageCount: number;
   pageSize: number;
@@ -86,7 +88,7 @@ const PageSizeOptions = ({
   const sizeOptions = [10, 20, 50, 100, 200];
   return (
     <div className="data-grid-page-size">
-      <Select
+      <SelectStyled
         value={pageSize.toString()}
         onChange={(e) => {
           setPageSize(e ? parseInt(e) : 0);
@@ -101,17 +103,53 @@ const PageSizeOptions = ({
   );
 };
 
+const SelectStyled = styled(Select)`
+  background-color: transparent;
+  .mantine-Select-input {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.2);
+    &::before,
+    &::after {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    &:focus {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+`;
+
 const ReactPaginateContainer = styled.div`
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-areas: 'info pagination size';
   grid-gap: 1rem;
-  padding: 0.5rem 1rem;
+  padding: 1.4rem 1.4rem;
   width: 100%;
   align-items: center;
   justify-content: space-between;
   font-size: 0.875rem;
 
+  .mantine-Popover-dropdown {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.2);
+    &::before,
+    &::after {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    &:focus {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
   .data-info {
     grid-area: info;
     color: rgba(255, 255, 255, 0.88);

@@ -5,12 +5,12 @@ import { useMemo } from 'react';
 
 interface MusicGridProps {
   data: undefined | Song[];
-  setMusicId: React.Dispatch<React.SetStateAction<Number | undefined>>;
+  setSong: React.Dispatch<React.SetStateAction<Song | undefined>>;
 }
 interface SongRowProps {
   $col: string;
 }
-const MusicGrid = ({ data, setMusicId }: MusicGridProps) => {
+const MusicGrid = ({ data, setSong }: MusicGridProps) => {
   const { screenSize } = useMediaQuery();
 
   const columnPercentage = useMemo(() => {
@@ -36,7 +36,7 @@ const MusicGrid = ({ data, setMusicId }: MusicGridProps) => {
         {data?.map((s: Song) => {
           return (
             <SongRow
-              onClick={() => setMusicId(s?.id)}
+              onClick={() => setSong(s)}
               key={crypto.randomUUID()}
               $col={columnPercentage}
             >
@@ -83,7 +83,7 @@ const SongRow = styled.div<SongRowProps>`
   border: 1px solid #fff;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  color: rgba(255, 255, 255, 0.88);
   width: ${({ $col }) => `calc(${$col} - 2rem)`};
   margin: 1rem;
   border-radius: 0.4rem;

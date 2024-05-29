@@ -1,0 +1,24 @@
+.mantine-Select-dropdown {
+  color: rgba(255, 255, 255, 0.88);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+}
+.mantine-Select-dropdown::where([data-mantine-color-scheme='light']) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.mantine-Select-dropdown::before,
+.mantine-Select-dropdown::after {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.mantine-Select-dropdown:hover {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mantine-Select-dropdown:focus {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mantine-Select-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: invert(70%);
+}
