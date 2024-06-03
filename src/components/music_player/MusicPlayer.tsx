@@ -6,7 +6,7 @@ import {
   IconPlayerSkipBackFilled,
   IconPlayerSkipForward
 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useToggle } from '../../hooks/useToggle';
 
@@ -18,6 +18,27 @@ interface MusicPlayerProps {
 const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
   const [isPlaying, toggleIsPlaying] = useToggle(false);
 
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const handlePlayClick = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+
+    toggleIsPlaying();
+  };
+
+  useEffect(() => {
+    if (isPlaying) {
+      toggleIsPlaying();
+    }
+  }, [musicSrc]);
+
+  console.log('audioRef', audioRef);
   return (
     <AudioPlayerContainer>
       <SongWrapper>
@@ -44,7 +65,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
         <ControlButton>
           <IconPlayerSkipBack />
         </ControlButton>
-        <ControlButton className="large">
+        <ControlButton className="large" onClick={handlePlayClick}>
           {isPlaying ? <IconPlayerPause /> : <IconPlayerPlayFilled />}
         </ControlButton>
         <ControlButton>
@@ -54,7 +75,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
           <IconPlayerSkipForwardFilled />
         </ControlButton>
       </ControlsWrapper>
-      <AudioPlayer src={musicSrc} controls>
+      <AudioPlayer src={musicSrc} controls ref={audioRef}>
         doesn't work
       </AudioPlayer>
     </AudioPlayerContainer>
