@@ -9,6 +9,8 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useToggle } from '../../hooks/useToggle';
+import useAudio from '../../hooks/useAudio';
+import { Slider } from '@mantine/core';
 
 interface MusicPlayerProps {
   musicSrc: string;
@@ -16,29 +18,17 @@ interface MusicPlayerProps {
 }
 
 const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
-  const [isPlaying, toggleIsPlaying] = useToggle(false);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  const handlePlayClick = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-
-    toggleIsPlaying();
-  };
-
-  useEffect(() => {
-    if (isPlaying) {
-      toggleIsPlaying();
-    }
-  }, [musicSrc]);
-
+  const { isPlaying, toggleIsPlaying, audioRef, handlePlayClick } = useAudio({
+    musicSrc
+  });
+  const [currentTime, setCurrentTime] = useState(0);
   console.log('audioRef', audioRef);
+  console.log('currentTime', audioRef?.current?.currentTime);
+  console.log('duration', audioRef?.current?.duration);
+  useEffect(() => {
+    if (audioRef?.current?.currentTime)
+      audioRef.current.currentTime = currentTime;
+  }, [audioRef, currentTime]);
   return (
     <AudioPlayerContainer>
       <SongWrapper>
@@ -75,6 +65,23 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
           <IconPlayerSkipForwardFilled />
         </ControlButton>
       </ControlsWrapper>
+      <Slider
+        style={{ width: '100%', marginTop: '1rem' }}
+        defaultValue={audioRef?.current?.currentTime || 0}
+        size={7}
+        min={0}
+        max={audioRef?.current?.duration}
+        value={audioRef?.current?.currentTime}
+        // value={
+        //   audioRef?.current?.currentTime
+        //     ? parseFloat(audioRef.current?.currentTime)
+        //     : 0
+        // }
+        onChange={(value) => {
+          console.log('input', value, audioRef?.current?.currentTime);
+          setCurrentTime(value);
+        }}
+      />
       <AudioPlayer src={musicSrc} controls ref={audioRef}>
         doesn't work
       </AudioPlayer>

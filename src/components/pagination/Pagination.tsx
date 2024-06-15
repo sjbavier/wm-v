@@ -98,6 +98,7 @@ const PageSizeOptions = ({
         data={sizeOptions.map((s) => s.toString())}
         checkIconPosition="right"
         color="white"
+        width="150px"
       />
     </div>
   );
@@ -189,13 +190,16 @@ const ReactPaginateContainer = styled.div`
   }
 
   .data-grid-page-size {
-    grid-area: size;
+    /* grid-area: size; */
     color: rgba(255, 255, 255, 0.88);
     display: flex;
     white-space: nowrap;
     align-items: center;
     gap: 0.5rem;
     margin-left: auto;
+    & > .mantine-InputWrapper-root {
+      width: 150px;
+    }
   }
   @media screen and (max-width: 1023px) {
     grid-template-columns: auto auto;
