@@ -6,11 +6,12 @@ import {
   IconPlayerSkipBackFilled,
   IconPlayerSkipForward
 } from '@tabler/icons-react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useToggle } from '../../hooks/useToggle';
 import useAudio from '../../hooks/useAudio';
 import { Slider } from '@mantine/core';
+import { useThrottledState } from '@mantine/hooks';
 
 interface MusicPlayerProps {
   musicSrc: string;
@@ -21,14 +22,32 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
   const { isPlaying, toggleIsPlaying, audioRef, handlePlayClick } = useAudio({
     musicSrc
   });
-  const [currentTime, setCurrentTime] = useState(0);
-  console.log('audioRef', audioRef);
+  const [currentTime, setCurrentTime] = useThrottledState(0, 300);
+  const [duration, setDuration] = useState(0);
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      requestAnimationFrame(handleTimeUpdate);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSliderChange = (value: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value;
+      setCurrentTime(value);
+    }
+  };
+
+  // console.log('audioRef', audioRef);
   console.log('currentTime', audioRef?.current?.currentTime);
-  console.log('duration', audioRef?.current?.duration);
-  useEffect(() => {
-    if (audioRef?.current?.currentTime)
-      audioRef.current.currentTime = currentTime;
-  }, [audioRef, currentTime]);
+  // console.log('duration', audioRef?.current?.duration);
   return (
     <AudioPlayerContainer>
       <SongWrapper>
@@ -67,22 +86,22 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
       </ControlsWrapper>
       <Slider
         style={{ width: '100%', marginTop: '1rem' }}
-        defaultValue={audioRef?.current?.currentTime || 0}
         size={7}
         min={0}
-        max={audioRef?.current?.duration}
-        value={audioRef?.current?.currentTime}
-        // value={
-        //   audioRef?.current?.currentTime
-        //     ? parseFloat(audioRef.current?.currentTime)
-        //     : 0
-        // }
+        max={duration}
+        value={currentTime}
         onChange={(value) => {
           console.log('input', value, audioRef?.current?.currentTime);
-          setCurrentTime(value);
+          handleSliderChange(value);
         }}
       />
-      <AudioPlayer src={musicSrc} controls ref={audioRef}>
+      <AudioPlayer
+        src={musicSrc}
+        controls
+        ref={audioRef}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+      >
         doesn't work
       </AudioPlayer>
     </AudioPlayerContainer>
