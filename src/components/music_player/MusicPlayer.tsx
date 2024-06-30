@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useToggle } from '../../hooks/useToggle';
 import useAudio from '../../hooks/useAudio';
-import { Slider, TextInput } from '@mantine/core';
+import { CloseButton, Input, Slider, TextInput } from '@mantine/core';
 import { useThrottledState } from '@mantine/hooks';
 
 interface MusicPlayerProps {
@@ -110,10 +110,18 @@ const MusicPlayer = ({
         }}
       />
       <div style={{ marginTop: '1rem' }}>
-        <TextInput
+        <Input
           placeholder="search"
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
+          rightSectionPointerEvents="all"
+          rightSection={
+            <CloseButton
+              aria-label="Clear input"
+              onClick={() => setSearch('')}
+              style={{ display: search ? undefined : 'none' }}
+            />
+          }
         />
       </div>
       <AudioPlayer
