@@ -2,8 +2,12 @@ import { gql, useQuery } from '@apollo/client';
 import { useMemo } from 'react';
 
 const MUSIC_QUERY = gql`
-  query getMusic($pageSize: Int, $pageNumber: Int) {
-    music(pageNumber: $pageNumber, pageSize: $pageSize) {
+  query getMusic($pageSize: Int, $pageNumber: Int, $searchText: String) {
+    music(
+      pageNumber: $pageNumber
+      pageSize: $pageSize
+      searchText: $searchText
+    ) {
       songs {
         id
         path
@@ -23,15 +27,17 @@ interface UseMusicInterface {
   skip: boolean;
   pageSize: number;
   pageNumber: number;
+  searchText: string | undefined;
 }
 
 export default function useMusic({
   skip,
   pageSize,
-  pageNumber
+  pageNumber,
+  searchText
 }: UseMusicInterface) {
   const { data, error, loading } = useQuery(MUSIC_QUERY, {
-    variables: { pageSize, pageNumber: pageNumber + 1 },
+    variables: { pageSize, pageNumber: pageNumber + 1, searchText },
     skip
   });
   const errors = useMemo(() => {

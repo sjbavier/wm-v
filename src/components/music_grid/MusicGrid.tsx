@@ -34,16 +34,25 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
     <Render if={Array.isArray(data) && data.length > 0}>
       <MusicGridContainer>
         {data?.map((s: Song) => {
+          const pathLength = s?.path?.split('/')?.length;
+          const pathArray = s?.path?.split('/');
+          const filename = pathArray
+            ?.find((p) => p.includes('.'))
+            ?.split('.')[0];
+          const artist = s?.artist
+            ? s.artist
+            : pathLength && pathLength > 3
+            ? s?.path?.split('/')[2]
+            : 'Unknown';
+          const title = s?.title ? s.title : filename;
           return (
             <SongRow
               onClick={() => setSong(s)}
               key={crypto.randomUUID()}
               $col={columnPercentage}
             >
-              <SongInfoChunk>{s?.artist ? s.artist : 'Unknown'}</SongInfoChunk>
-              <SongInfoChunk className="title">
-                {s?.title ? s.title : s?.path?.split('/')[2].split('.')[0]}
-              </SongInfoChunk>
+              <SongInfoChunk>{artist}</SongInfoChunk>
+              <SongInfoChunk className="title">{title}</SongInfoChunk>
 
               <SongMetaData>
                 <SongInfoChunk>{s?.genre ? s.genre : 'None'}</SongInfoChunk>

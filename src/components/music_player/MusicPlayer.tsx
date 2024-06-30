@@ -10,15 +10,22 @@ import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useToggle } from '../../hooks/useToggle';
 import useAudio from '../../hooks/useAudio';
-import { Slider } from '@mantine/core';
+import { Slider, TextInput } from '@mantine/core';
 import { useThrottledState } from '@mantine/hooks';
 
 interface MusicPlayerProps {
   musicSrc: string;
   song: Song | undefined;
+  search: string | undefined;
+  setSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
-const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
+const MusicPlayer = ({
+  musicSrc,
+  song,
+  search,
+  setSearch
+}: MusicPlayerProps) => {
   const { isPlaying, toggleIsPlaying, audioRef, handlePlayClick } = useAudio({
     musicSrc
   });
@@ -45,19 +52,26 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
     }
   };
 
+  const pathLength = song?.path?.split('/')?.length;
+  const pathArray = song?.path?.split('/');
+  const filename = pathArray?.find((p) => p.includes('.'))?.split('.')[0];
+  const artist = song?.artist
+    ? song.artist
+    : pathLength && pathLength > 3
+    ? song?.path?.split('/')[2]
+    : 'Unknown';
+  const title = song?.title ? song.title : filename;
+
+  // console.log('song', song);
   // console.log('audioRef', audioRef);
-  console.log('currentTime', audioRef?.current?.currentTime);
+  // console.log('currentTime', audioRef?.current?.currentTime);
   // console.log('duration', audioRef?.current?.duration);
   return (
     <AudioPlayerContainer>
       <SongWrapper>
         <div className="d-flex flex-col">
-          <SongInfoChunk>
-            {song?.artist ? song.artist : 'Unknown'}
-          </SongInfoChunk>
-          <SongInfoChunk className="title">
-            {song?.title ? song.title : song?.path?.split('/')[2].split('.')[0]}
-          </SongInfoChunk>
+          <SongInfoChunk className="artist">{artist}</SongInfoChunk>
+          <SongInfoChunk className="title">{title}</SongInfoChunk>
         </div>
         <div className="d-flex flex-col">
           <SongInfoChunk>{song?.genre ? song.genre : 'None'}</SongInfoChunk>
@@ -95,6 +109,13 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
           handleSliderChange(value);
         }}
       />
+      <div style={{ marginTop: '1rem' }}>
+        <TextInput
+          placeholder="search"
+          value={search}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+        />
+      </div>
       <AudioPlayer
         src={musicSrc}
         controls
