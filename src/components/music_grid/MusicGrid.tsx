@@ -9,6 +9,7 @@ interface MusicGridProps {
 }
 interface SongRowProps {
   $col: string;
+  $coverArt?: string;
 }
 const MusicGrid = ({ data, setSong }: MusicGridProps) => {
   const { screenSize } = useMediaQuery();
@@ -50,6 +51,7 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
               onClick={() => setSong(s)}
               key={crypto.randomUUID()}
               $col={columnPercentage}
+              $coverArt={s?.cover_art}
             >
               <SongInfoChunk>{artist}</SongInfoChunk>
               <SongInfoChunk className="title">{title}</SongInfoChunk>
@@ -90,7 +92,11 @@ const SongRow = styled.div<SongRowProps>`
   flex-wrap: wrap;
   cursor: pointer;
   border: 1px solid #fff;
-  background: rgba(255, 255, 255, 0.1);
+  background: ${({ $coverArt }) =>
+    $coverArt
+      ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
+      : 'rgba(255, 255, 255, 0.1)'};
+  background-size: cover;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: rgba(255, 255, 255, 0.88);
   width: ${({ $col }) => `calc(${$col} - 2rem)`};
@@ -98,7 +104,11 @@ const SongRow = styled.div<SongRowProps>`
   border-radius: 0.4rem;
   transition: transform 150ms ease-in-out;
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: ${({ $coverArt }) =>
+      $coverArt
+        ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
+        : 'rgba(255, 255, 255, 0.2)'};
+    background-size: cover;
     transform: scale(1.02);
   }
 `;

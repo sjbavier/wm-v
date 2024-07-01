@@ -17,6 +17,7 @@ const MUSIC_QUERY = gql`
         album
         genre
         release_year
+        cover_art
       }
       totalItemsCount
     }

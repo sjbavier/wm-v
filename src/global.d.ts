@@ -157,4 +157,5 @@ declare type Song = {
   album?: string;
   genre?: string;
   release_year?: string;
+  cover_art?: string;
 };
