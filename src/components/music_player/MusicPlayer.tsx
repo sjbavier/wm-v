@@ -109,7 +109,7 @@ const MusicPlayer = ({
           handleSliderChange(value);
         }}
       />
-      <div style={{ marginTop: '1rem' }}>
+      <SearchWrapper>
         <Input
           placeholder="search"
           value={search}
@@ -123,7 +123,7 @@ const MusicPlayer = ({
             />
           }
         />
-      </div>
+      </SearchWrapper>
       <AudioPlayer
         src={musicSrc}
         controls
@@ -157,7 +157,13 @@ const SongWrapper = styled.div`
   justify-content: space-between;
   width: 100%;
 `;
-
+const SearchWrapper = styled.div`
+  margin-top: 1rem;
+  & input {
+    /* background-color: var(--shade-1) !important; */
+    background-color: transparent !important;
+  }
+`;
 const SongInfoChunk = styled.div`
   color: rgba(255, 255, 255, 0.66);
   &.title {

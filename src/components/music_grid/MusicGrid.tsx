@@ -11,6 +11,9 @@ interface SongRowProps {
   $col: string;
   $coverArt?: string;
 }
+interface DarkenProps {
+  $coverArt?: string;
+}
 const MusicGrid = ({ data, setSong }: MusicGridProps) => {
   const { screenSize } = useMediaQuery();
 
@@ -53,15 +56,17 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
               $col={columnPercentage}
               $coverArt={s?.cover_art}
             >
-              <SongInfoChunk>{artist}</SongInfoChunk>
-              <SongInfoChunk className="title">{title}</SongInfoChunk>
+              <Darken $coverArt={s?.cover_art}>
+                <SongInfoChunk>{artist}</SongInfoChunk>
+                <SongInfoChunk className="title">{title}</SongInfoChunk>
 
-              <SongMetaData>
-                <SongInfoChunk>{s?.genre ? s.genre : 'None'}</SongInfoChunk>
-                <SongInfoChunk>
-                  {s?.release_year ? s.release_year : '----'}
-                </SongInfoChunk>
-              </SongMetaData>
+                <SongMetaData>
+                  <SongInfoChunk>{s?.genre ? s.genre : 'None'}</SongInfoChunk>
+                  <SongInfoChunk>
+                    {s?.release_year ? s.release_year : '----'}
+                  </SongInfoChunk>
+                </SongMetaData>
+              </Darken>
             </SongRow>
           );
         })}
@@ -95,7 +100,7 @@ const SongRow = styled.div<SongRowProps>`
   background: ${({ $coverArt }) =>
     $coverArt
       ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
-      : 'rgba(255, 255, 255, 0.1)'};
+      : 'var(--shade-1)'};
   background-size: cover;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: rgba(255, 255, 255, 0.88);
@@ -107,17 +112,24 @@ const SongRow = styled.div<SongRowProps>`
     background: ${({ $coverArt }) =>
       $coverArt
         ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
-        : 'rgba(255, 255, 255, 0.2)'};
+        : 'var(--shade-2)'};
     background-size: cover;
     transform: scale(1.02);
   }
 `;
+const Darken = styled.div<DarkenProps>`
+  background-color: ${({ $coverArt }) => ($coverArt ? 'var(--shade-1)' : '')};
+  border-radius: 0.4rem;
+  width: 100%;
+`;
 const SongInfoChunk = styled.div`
   padding: 1rem;
   word-break: break-all;
+  /* background-color: var(--shade-3); */
   &.title {
     font-size: 1.3rem;
     width: 100%;
+    background-color: var(--shade-3);
   }
 `;
 export default MusicGrid;
