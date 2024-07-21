@@ -20,6 +20,19 @@ interface MusicPlayerProps {
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
+// Helper function to format time in seconds to mm:ss
+const formatTime = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+};
+
+// Helper function to parse mm:ss to seconds
+const parseTime = (time: string): number => {
+  const [minutes, seconds] = time.split(':').map(Number);
+  return minutes * 60 + seconds;
+};
+
 const MusicPlayer = ({
   musicSrc,
   song,
@@ -30,8 +43,15 @@ const MusicPlayer = ({
   const { isPlaying, audioRef, handlePlayClick } = useAudio({
     musicSrc
   });
-  const [currentTime, setCurrentTime] = useThrottledState(0, 300);
+  const [currentTime, setCurrentTime] = useThrottledState(0, 1000);
   const [duration, setDuration] = useState(0);
+  const [marks, setMarks] = useState<
+    | {
+        value: number;
+        label?: React.ReactNode;
+      }[]
+    | undefined
+  >(undefined);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -43,6 +63,26 @@ const MusicPlayer = ({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      setMarks([
+        {
+          value: Math.floor(audioRef.current.duration / 4),
+          label: `${formatTime(Math.floor(audioRef.current.duration / 4))}`
+        },
+        {
+          value: Math.floor(audioRef.current.duration / 2),
+          label: `${formatTime(Math.floor(audioRef.current.duration / 2))}`
+        },
+        {
+          value: Math.floor((audioRef.current.duration / 4) * 3),
+          label: `${formatTime(
+            Math.floor((audioRef.current.duration / 4) * 3)
+          )}`
+        },
+        {
+          value: audioRef.current.duration,
+          label: `${formatTime(audioRef.current.duration)}`
+        }
+      ]);
     }
   };
 
@@ -101,11 +141,14 @@ const MusicPlayer = ({
         </ControlButton> */}
       </ControlsWrapper>
       <StyledSlider
-        // style={{ width: '100%', marginTop: '1rem' }}
-        size={7}
         min={0}
         max={duration}
         value={currentTime}
+        label={formatTime}
+        labelAlwaysOn
+        size={2}
+        marks={marks}
+        thumbSize={25}
         onChange={(value) => {
           handleSliderChange(value);
         }}
@@ -114,6 +157,7 @@ const MusicPlayer = ({
         <Input
           placeholder="search"
           value={search}
+          variant="unstyled"
           onChange={(event) => setSearch(event.currentTarget.value)}
           rightSectionPointerEvents="all"
           rightSection={
@@ -156,8 +200,14 @@ const SearchWrapper = styled.div`
   margin-top: 1rem;
   & input {
     /* background-color: var(--shade-1) !important; */
-    background-color: transparent !important;
-    color: #fff;
+    /* background-color: transparent !important; */
+    /* color: #fff; */
+    padding: 0.7rem;
+    border-radius: 1rem;
+    background: ${darken('var(--mantine-color-green-3)', 0.88)};
+    border-width: 1px;
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+    color: ${lighten('var(--mantine-color-green-5)', 0.1)};
   }
 `;
 const SongInfoChunk = styled.div`
@@ -208,7 +258,7 @@ const ControlButton = styled.div`
 
 const StyledSlider = styled(Slider)`
   width: 100%;
-  margin-top: 1rem;
+  margin-block: 1rem;
   .mantine-Slider-bar {
     background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
     &:hover {
