@@ -38,13 +38,25 @@ const MusicContainer = () => {
   return (
     <AudioContainer $coverArt={song?.cover_art}>
       <BlurLayer>
-        {/* audio player */}
-        <MusicPlayer
-          musicSrc={musicSrc}
-          song={song}
-          search={search}
-          setSearch={setSearch}
-        />
+        <StickyContainer className="bg-wm_dk_blue-600">
+          {/* audio player */}
+          <MusicPlayer
+            musicSrc={musicSrc}
+            song={song}
+            search={search}
+            setSearch={setSearch}
+            setPage={setPage}
+          />
+          <PaginationContainer
+            pageCount={pageCount || 1}
+            setPageSize={setPageSize}
+            pageSize={pageSize}
+            totalItemsCount={totalItemsCount}
+            page={page}
+            setPage={setPage}
+            clearSelected={() => {}}
+          />
+        </StickyContainer>
         {/* error  */}
         <Render
           if={
@@ -63,41 +75,44 @@ const MusicContainer = () => {
         </Render>
         {/* loader  */}
         <Render if={loading}>
-          <Loader />
+          <div className="flex items-center w-100 justify-center min-h-screen">
+            <Loader />
+          </div>
         </Render>
-        <PaginationContainer
-          pageCount={pageCount || 1}
-          setPageSize={setPageSize}
-          pageSize={pageSize}
-          totalItemsCount={totalItemsCount}
-          page={page}
-          setPage={setPage}
-          clearSelected={() => {}}
-        />
         {/* music list  */}
         <MusicGrid data={data} setSong={setSong} />
       </BlurLayer>
     </AudioContainer>
   );
 };
+const StickyContainer = styled.div`
+  position: sticky;
+  top: 0;
+  left: 0;
+  /* backdrop-filter: blur(7px); */
+  /* background: var(--gradient-music-default); */
+  backdrop-filter: brightness(0.05%);
+  z-index: 100;
+`;
 
 const AudioContainer = styled.div<AudioContainerProps>`
   --shade-1: rgba(0, 0, 0, 0.23);
   --shade-2: rgba(0, 0, 0, 0.43);
   --shade-3: rgba(0, 0, 0, 0.53);
-  /* background-image: linear-gradient(
+  --shade-4: rgba(0, 0, 0, 0.86);
+  --gradient-music-default: linear-gradient(
     to right top,
     rgb(5 25 55 / 24%),
     rgb(0 77 122 / 32%),
     rgb(0 135 147 / 28%),
-    rgb(0 191 114 / 31%),
-    rgb(168 235 18 / 26%)
-  );  */
+    /* rgb(0 191 114 / 31%),
+    rgb(168 235 18 / 26%) */
+  );
 
   background: ${({ $coverArt }) =>
     $coverArt
       ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
-      : 'rgba(255, 255, 255, 0.1)'};
+      : 'var(--gradient-music-default)'};
   background-size: cover;
   margin-left: 48px;
   min-height: 100%;

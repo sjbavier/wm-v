@@ -1,16 +1,15 @@
-import {
-  IconPlayerPlayFilled,
-  IconPlayerSkipForwardFilled,
-  IconPlayerPause,
-  IconPlayerSkipBack,
-  IconPlayerSkipBackFilled,
-  IconPlayerSkipForward
-} from '@tabler/icons-react';
-import { useCallback, useEffect, useState } from 'react';
+import { IconPlayerPlayFilled, IconPlayerPause } from '@tabler/icons-react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { useToggle } from '../../hooks/useToggle';
 import useAudio from '../../hooks/useAudio';
-import { CloseButton, Input, Slider, TextInput } from '@mantine/core';
+import {
+  CloseButton,
+  Input,
+  Slider,
+  alpha,
+  darken,
+  lighten
+} from '@mantine/core';
 import { useThrottledState } from '@mantine/hooks';
 
 interface MusicPlayerProps {
@@ -18,15 +17,17 @@ interface MusicPlayerProps {
   song: Song | undefined;
   search: string | undefined;
   setSearch: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const MusicPlayer = ({
   musicSrc,
   song,
   search,
-  setSearch
+  setSearch: setSearchText,
+  setPage
 }: MusicPlayerProps) => {
-  const { isPlaying, toggleIsPlaying, audioRef, handlePlayClick } = useAudio({
+  const { isPlaying, audioRef, handlePlayClick } = useAudio({
     musicSrc
   });
   const [currentTime, setCurrentTime] = useThrottledState(0, 300);
@@ -52,6 +53,11 @@ const MusicPlayer = ({
     }
   };
 
+  const setSearch = (searchText: string) => {
+    setSearchText(searchText);
+    setPage(0);
+  };
+
   const pathLength = song?.path?.split('/')?.length;
   const pathArray = song?.path?.split('/');
   const filename = pathArray?.find((p) => p.includes('.'))?.split('.')[0];
@@ -62,10 +68,6 @@ const MusicPlayer = ({
     : 'Unknown';
   const title = song?.title ? song.title : filename;
 
-  // console.log('song', song);
-  // console.log('audioRef', audioRef);
-  // console.log('currentTime', audioRef?.current?.currentTime);
-  // console.log('duration', audioRef?.current?.duration);
   return (
     <AudioPlayerContainer>
       <SongWrapper>
@@ -82,30 +84,29 @@ const MusicPlayer = ({
       </SongWrapper>
 
       <ControlsWrapper>
-        <ControlButton>
+        {/* <ControlButton>
           <IconPlayerSkipBackFilled />
         </ControlButton>
         <ControlButton>
           <IconPlayerSkipBack />
-        </ControlButton>
+        </ControlButton> */}
         <ControlButton className="large" onClick={handlePlayClick}>
           {isPlaying ? <IconPlayerPause /> : <IconPlayerPlayFilled />}
         </ControlButton>
-        <ControlButton>
+        {/* <ControlButton>
           <IconPlayerSkipForward />
         </ControlButton>
         <ControlButton>
           <IconPlayerSkipForwardFilled />
-        </ControlButton>
+        </ControlButton> */}
       </ControlsWrapper>
-      <Slider
-        style={{ width: '100%', marginTop: '1rem' }}
+      <StyledSlider
+        // style={{ width: '100%', marginTop: '1rem' }}
         size={7}
         min={0}
         max={duration}
         value={currentTime}
         onChange={(value) => {
-          console.log('input', value, audioRef?.current?.currentTime);
           handleSliderChange(value);
         }}
       />
@@ -137,18 +138,12 @@ const MusicPlayer = ({
   );
 };
 const AudioPlayerContainer = styled.div`
-  position: sticky;
-  top: 0;
-  left: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
-  /* background: rgba(255, 255, 255, 0.1); */
-  backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.4rem;
   align-items: center;
-  z-index: 100;
 `;
 
 const SongWrapper = styled.div`
@@ -162,6 +157,7 @@ const SearchWrapper = styled.div`
   & input {
     /* background-color: var(--shade-1) !important; */
     background-color: transparent !important;
+    color: #fff;
   }
 `;
 const SongInfoChunk = styled.div`
@@ -186,9 +182,11 @@ const ControlButton = styled.div`
   height: 50px;
   margin-inline: 0.4rem;
   border-radius: 50%;
-  color: rgba(255, 255, 255, 0.66);
   font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-width: 1px;
+  background: ${darken('var(--mantine-color-green-3)', 0.88)};
+  border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+  color: ${lighten('var(--mantine-color-green-5)', 0.1)};
   & > svg {
     width: 1.2rem;
     height: 1.2rem;
@@ -202,8 +200,23 @@ const ControlButton = styled.div`
     }
   }
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.88);
+    color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+    background: ${darken('var(--mantine-color-green-3)', 0.83)};
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+  }
+`;
+
+const StyledSlider = styled(Slider)`
+  width: 100%;
+  margin-top: 1rem;
+  .mantine-Slider-bar {
+    background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+    &:hover {
+      background-color: ${alpha('var(--mantine-color-green-6)', 0.66)};
+    }
+  }
+  .mantine-Slider-thumb {
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
   }
 `;
 

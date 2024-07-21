@@ -1,4 +1,4 @@
-import { Input, Select } from '@mantine/core';
+import { Select, alpha, darken, lighten } from '@mantine/core';
 import ReactPaginate from 'react-paginate';
 import styled from 'styled-components';
 
@@ -30,7 +30,8 @@ const PaginationContainer = ({
     const startItem = totalItemsCount !== 0 ? page * pageSize + 1 : 0;
     return (
       <div className="data-info">
-        <strong>{startItem}</strong> - <strong>{endItem}</strong> of{' '}
+        <strong className="highlight">{startItem} - </strong>
+        <strong className="highlight">{endItem}</strong> of{' '}
         <strong>{totalItemsCount?.toString()}</strong>
       </div>
     );
@@ -107,26 +108,29 @@ const PageSizeOptions = ({
 const SelectStyled = styled(Select)`
   background-color: transparent;
   .mantine-Select-input {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.88);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: ${darken('var(--mantine-color-green-3)', 0.88)};
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+    color: ${lighten('var(--mantine-color-green-5)', 0.1)};
     &::before,
     &::after {
       border-color: rgba(255, 255, 255, 0.2);
     }
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+      background: ${darken('var(--mantine-color-green-3)', 0.83)};
+      border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
     }
     &:focus {
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+      background: ${darken('var(--mantine-color-green-3)', 0.83)};
+      border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
     }
   }
 `;
 
 const ReactPaginateContainer = styled.div`
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto 1fr;
   grid-template-areas: 'info pagination size';
   grid-gap: 1rem;
   padding: 1.4rem 1.4rem;
@@ -134,7 +138,6 @@ const ReactPaginateContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   font-size: 0.875rem;
-
   .mantine-Popover-dropdown {
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.88);
@@ -155,6 +158,9 @@ const ReactPaginateContainer = styled.div`
     grid-area: info;
     color: rgba(255, 255, 255, 0.88);
     font-weight: 500;
+    .highlight {
+      color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+    }
   }
 
   .pagination {
@@ -166,7 +172,9 @@ const ReactPaginateContainer = styled.div`
     li {
       &.active {
         a {
-          background: rgba(255, 255, 255, 0.2);
+          color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+          background: ${darken('var(--mantine-color-green-3)', 0.83)};
+          border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
         }
       }
       a {
@@ -181,7 +189,9 @@ const ReactPaginateContainer = styled.div`
         font-weight: 700;
         border: 1px solid rgba(255, 255, 255, 0.3);
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
+          color: ${lighten('var(--mantine-color-green-5)', 0.1)};
+          background: ${darken('var(--mantine-color-green-3)', 0.88)};
+          border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
         }
       }
       margin-top: 0;

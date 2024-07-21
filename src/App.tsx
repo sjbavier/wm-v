@@ -26,7 +26,9 @@ const App: FC = () => {
     <PerspectiveWrapper
       color={color}
       className={classNames(
-        `h-full w-full fixed perspective-9 ${color ? '' : 'bg-wm_dk_blue-700'}`
+        `h-full w-full fixed perspective-9 
+        // ${color ? '' : 'bg-wm_dk_blue-700'}
+        `
       )}
     >
       <NavButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
