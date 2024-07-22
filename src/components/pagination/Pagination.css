@@ -1,7 +1,7 @@
 .mantine-Select-dropdown {
-  color: rgba(255, 255, 255, 0.88);
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
+  color: color-mix(in srgb, var(--mantine-color-green-5), white 20%);
+  border-color: color-mix(in srgb, var(--mantine-color-green-5), white 30%);
+  background: rgb(17 28 18 / 15%);
   backdrop-filter: blur(15px);
   width: 150px !important;
 }
@@ -13,10 +13,14 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 .mantine-Select-dropdown:hover {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--mantine-color-green-5), white 30%);
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
 }
 .mantine-Select-dropdown:focus {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-width: 1px;
+  border-color: color-mix(in srgb, var(--mantine-color-green-5), white 30%);
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
 }
 
 .mantine-Select-option:hover {

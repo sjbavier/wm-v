@@ -118,6 +118,9 @@ const SongRow = styled.div<SongRowProps>`
   }
 `;
 const Darken = styled.div<DarkenProps>`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   background-color: ${({ $coverArt }) => ($coverArt ? 'var(--shade-1)' : '')};
   border-radius: 0.4rem;
   width: 100%;
