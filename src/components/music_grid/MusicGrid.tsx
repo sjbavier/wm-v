@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import Render from '../render/Render';
-import useMediaQuery, { Size } from '../../hooks/useMediaQuery';
+import { Size } from '../../hooks/useMediaQuery';
 import { useMemo } from 'react';
+import useMusicContext from '../../providers/useMusicContext';
 
 interface MusicGridProps {
   data: undefined | Song[];
@@ -15,7 +16,7 @@ interface DarkenProps {
   $coverArt?: string;
 }
 const MusicGrid = ({ data, setSong }: MusicGridProps) => {
-  const { screenSize } = useMediaQuery();
+  const { screenSize } = useMusicContext();
 
   const columnPercentage = useMemo(() => {
     switch (screenSize) {
@@ -102,11 +103,12 @@ const SongRow = styled.div<SongRowProps>`
       ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
       : 'var(--shade-1)'};
   background-size: cover;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* border: 1px solid rgba(255, 255, 255, 0.3); */
+  border: none;
   color: rgba(255, 255, 255, 0.88);
   width: ${({ $col }) => `calc(${$col} - 2rem)`};
   margin: 1rem;
-  border-radius: 0.4rem;
+  border-radius: 0.2rem;
   transition: transform 150ms ease-in-out;
   &:hover {
     background: ${({ $coverArt }) =>

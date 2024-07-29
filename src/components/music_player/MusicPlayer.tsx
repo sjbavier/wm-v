@@ -1,4 +1,4 @@
-import { IconPlayerPlayFilled, IconPlayerPause } from '@tabler/icons-react';
+import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import useAudio from '../../hooks/useAudio';
@@ -11,6 +11,7 @@ import {
   lighten
 } from '@mantine/core';
 import { useThrottledState } from '@mantine/hooks';
+import LayoutOptions from '../music_grid/LayoutOptions';
 
 interface MusicPlayerProps {
   musicSrc: string;
@@ -28,10 +29,10 @@ const formatTime = (seconds: number): string => {
 };
 
 // Helper function to parse mm:ss to seconds
-const parseTime = (time: string): number => {
-  const [minutes, seconds] = time.split(':').map(Number);
-  return minutes * 60 + seconds;
-};
+// const parseTime = (time: string): number => {
+//   const [minutes, seconds] = time.split(':').map(Number);
+//   return minutes * 60 + seconds;
+// };
 
 const MusicPlayer = ({
   musicSrc,
@@ -131,7 +132,11 @@ const MusicPlayer = ({
           <IconPlayerSkipBack />
         </ControlButton> */}
         <ControlButton className="large" onClick={handlePlayClick}>
-          {isPlaying ? <IconPlayerPause /> : <IconPlayerPlayFilled />}
+          {isPlaying ? (
+            <IconPlayerPause stroke={`1`} />
+          ) : (
+            <IconPlayerPlay stroke={`1`} />
+          )}
         </ControlButton>
         {/* <ControlButton>
           <IconPlayerSkipForward />
@@ -178,6 +183,7 @@ const MusicPlayer = ({
       >
         doesn't work
       </AudioPlayer>
+      <LayoutOptions />
     </AudioPlayerContainer>
   );
 };
@@ -242,9 +248,17 @@ const ControlButton = styled.div`
     height: 1.2rem;
   }
   &.large {
+    @media screen and (max-width: 768px) {
+      width: 55px;
+      height: 55px;
+    }
     width: 75px;
     height: 75px;
     & > svg {
+      @media screen and (max-width: 768px) {
+        width: 1.6rem;
+        height: 1.6rem;
+      }
       width: 2rem;
       height: 2rem;
     }

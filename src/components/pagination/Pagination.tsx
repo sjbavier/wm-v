@@ -3,6 +3,9 @@ import ReactPaginate from 'react-paginate';
 import styled from 'styled-components';
 
 import './Pagination.css';
+import useMusicContext from '../../providers/useMusicContext';
+import { useMemo } from 'react';
+import { Size } from '../../hooks/useMediaQuery';
 
 interface PaginationContainerProps {
   pageCount: number;
@@ -22,6 +25,23 @@ const PaginationContainer = ({
   setPage,
   clearSelected
 }: PaginationContainerProps) => {
+  const { screenSize } = useMusicContext();
+  const pageRange = useMemo(() => {
+    switch (screenSize) {
+      case Size.XS:
+        return { page: 1, margin: 1 };
+      case Size.SM:
+        return { page: 1, margin: 1 };
+      case Size.MD:
+        return { page: 1, margin: 1 };
+      case Size.LG:
+        return { page: 2, margin: 1 };
+      case Size.XL:
+        return { page: 3, margin: 2 };
+      default:
+        return { page: 1, margin: 1 };
+    }
+  }, [screenSize]);
   const ShowPageInformation = () => {
     const endItem: number =
       page * pageSize + pageSize > totalItemsCount
@@ -47,11 +67,11 @@ const PaginationContainer = ({
         onPageChange={({ selected }) => {
           setPage && setPage(selected);
         }}
-        pageRangeDisplayed={4}
+        pageRangeDisplayed={pageRange.page}
+        marginPagesDisplayed={pageRange.margin}
         pageCount={pageCount}
         previousLabel="<"
         renderOnZeroPageCount={null}
-        marginPagesDisplayed={1}
         pageClassName="page-item"
         pageLinkClassName="page-link"
         previousClassName="page-item"
@@ -181,6 +201,11 @@ const ReactPaginateContainer = styled.div`
         display: flex;
         align-items: center;
         justify-content: center;
+        @media screen and (max-width: 768px) {
+          width: 35px;
+          height: 35px;
+          margin-inline: 0.1rem;
+        }
         width: 50px;
         height: 50px;
         margin-inline: 0.4rem;

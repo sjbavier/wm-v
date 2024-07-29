@@ -7,11 +7,14 @@ import PaginationContainer from '../../components/pagination/Pagination';
 import MusicGrid from '../../components/music_grid/MusicGrid';
 import MusicPlayer from '../../components/music_player/MusicPlayer';
 import { useDebouncedValue } from '@mantine/hooks';
+import { MusicContextProvider } from '../../providers/useMusicContext';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 interface AudioContainerProps {
   $coverArt?: string;
 }
 const MusicContainer = () => {
+  const { screenSize } = useMediaQuery();
   const [song, setSong] = useState<Song | undefined>({ id: 1 });
   const [search, setSearch] = useState<string | undefined>(undefined);
   const baseUrl = import.meta.env.VITE_GO_API;
@@ -35,54 +38,59 @@ const MusicContainer = () => {
     searchText,
     skip: false
   });
+  console.log('screenSize', screenSize);
   return (
-    <AudioContainer $coverArt={song?.cover_art}>
-      <BlurLayer>
-        <StickyContainer className="bg-wm_dk_blue-600">
-          {/* audio player */}
-          <MusicPlayer
-            musicSrc={musicSrc}
-            song={song}
-            search={search}
-            setSearch={setSearch}
-            setPage={setPage}
-          />
-          <PaginationContainer
-            pageCount={pageCount || 1}
-            setPageSize={setPageSize}
-            pageSize={pageSize}
-            totalItemsCount={totalItemsCount}
-            page={page}
-            setPage={setPage}
-            clearSelected={() => {}}
-          />
-        </StickyContainer>
-        {/* error  */}
-        <Render
-          if={
-            Array.isArray(errors) &&
-            errors.length > 0 &&
-            errors?.[0] !== undefined
-          }
-        >
-          <Alert variant="light" color="red" radius="lg" title="[Error:]">
-            {errors.map((e) => (
-              <Text key={crypto.randomUUID()} style={{ color: '#fff' }}>
-                {e?.message}
-              </Text>
-            ))}
-          </Alert>
-        </Render>
-        {/* loader  */}
-        <Render if={loading}>
-          <div className="flex items-center w-100 justify-center min-h-screen">
-            <Loader />
-          </div>
-        </Render>
-        {/* music list  */}
-        <MusicGrid data={data} setSong={setSong} />
-      </BlurLayer>
-    </AudioContainer>
+    <MusicContextProvider
+      value={{ screenSize, search, setSearch, song, setSong, page, setPage }}
+    >
+      <AudioContainer $coverArt={song?.cover_art}>
+        <BlurLayer>
+          <StickyContainer className="bg-wm_dk_blue-600">
+            {/* audio player */}
+            <MusicPlayer
+              musicSrc={musicSrc}
+              song={song}
+              search={search}
+              setSearch={setSearch}
+              setPage={setPage}
+            />
+            <PaginationContainer
+              pageCount={pageCount || 1}
+              setPageSize={setPageSize}
+              pageSize={pageSize}
+              totalItemsCount={totalItemsCount}
+              page={page}
+              setPage={setPage}
+              clearSelected={() => {}}
+            />
+          </StickyContainer>
+          {/* error  */}
+          <Render
+            if={
+              Array.isArray(errors) &&
+              errors.length > 0 &&
+              errors?.[0] !== undefined
+            }
+          >
+            <Alert variant="light" color="red" radius="lg" title="[Error:]">
+              {errors.map((e) => (
+                <Text key={crypto.randomUUID()} style={{ color: '#fff' }}>
+                  {e?.message}
+                </Text>
+              ))}
+            </Alert>
+          </Render>
+          {/* loader  */}
+          <Render if={loading}>
+            <div className="flex items-center w-100 justify-center min-h-screen">
+              <Loader />
+            </div>
+          </Render>
+          {/* music list  */}
+          <MusicGrid data={data} setSong={setSong} />
+        </BlurLayer>
+      </AudioContainer>
+    </MusicContextProvider>
   );
 };
 const StickyContainer = styled.div`
