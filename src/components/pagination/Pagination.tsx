@@ -153,7 +153,7 @@ const ReactPaginateContainer = styled.div`
   grid-template-columns: 1fr auto 1fr;
   grid-template-areas: 'info pagination size';
   grid-gap: 1rem;
-  padding: 1.4rem 1.4rem;
+  padding: 0.8rem 1.4rem;
   width: 100%;
   align-items: center;
   justify-content: space-between;
@@ -206,12 +206,12 @@ const ReactPaginateContainer = styled.div`
           height: 35px;
           margin-inline: 0.1rem;
         }
-        width: 50px;
-        height: 50px;
-        margin-inline: 0.4rem;
+        width: 35px;
+        height: 35px;
+        margin-inline: 0.2rem;
         border-radius: 50%;
         color: rgba(255, 255, 255, 0.88);
-        font-weight: 700;
+        font-weight: 500;
         border: 1px solid rgba(255, 255, 255, 0.3);
         &:hover {
           color: ${lighten('var(--mantine-color-green-5)', 0.1)};
