@@ -170,8 +170,7 @@ const AudioContainer = styled.div<AudioContainerProps>`
         : 'linear-gradient(0deg, rgba(40, 48, 3, 1) 0%, rgba(64, 59, 52, 1) 20%, rgba(34, 39, 43, 1) 40%, rgba(20, 21, 14, 1) 60%, rgba(76, 76, 76, 1) 80%, rgba(0, 0, 0, 1) 100%);'};
 
     /* Rotate around the center of the pseudo-element */
-    /* transform-origin: center center; */
-    transform-origin: 5% 5% 5% 10%;
+    transform-origin: center center;
 
     /* The rotation animation */
     animation: rotateGradient 45s ease-in-out infinite;
@@ -181,18 +180,28 @@ const AudioContainer = styled.div<AudioContainerProps>`
   @keyframes rotateGradient {
     0% {
       transform: rotate(0deg);
+      /* transform-origin: -5% 5% -5% 5%; */
+      transform-origin: -15% 15% -15% 15%;
     }
     25% {
       transform: rotate(360deg);
+      /* transform-origin: 5% -5% 5% -5%; */
+      transform-origin: 15% -15% 15% -15%;
     }
     50% {
       transform: rotate(0deg);
+      /* transform-origin: -5% 5% -5% 5%; */
+      transform-origin: -15% 15% -15% 15%;
     }
     75% {
       transform: rotate(360deg);
+      /* transform-origin: 5% -5% 5% -5%; */
+      transform-origin: 15% -15% 15% -15%;
     }
     100% {
       transform: rotate(0deg);
+      /* transform-origin: -5% 5% -5% 5%; */
+      transform-origin: -15% 15% -15% 15%;
     }
   }
 `;
