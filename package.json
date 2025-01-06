@@ -16,6 +16,7 @@
     "@mantine/hooks": "^7.9.2",
     "@tabler/icons-react": "^2.42.0",
     "classnames": "^2.3.2",
+    "extract-colors": "^4.1.1",
     "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-colorful": "^5.6.1",

@@ -128,11 +128,11 @@ const Darken = styled.div<DarkenProps>`
   width: 100%;
 `;
 const SongInfoChunk = styled.div`
-  padding: 1rem;
+  padding: 0.8rem;
   word-break: break-all;
   /* background-color: var(--shade-3); */
   &.title {
-    font-size: 1.3rem;
+    font-size: 0.95rem;
     width: 100%;
     background-color: var(--shade-3);
   }
