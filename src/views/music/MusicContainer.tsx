@@ -66,7 +66,8 @@ const MusicContainer = () => {
           const steps = 100 / (data.length - 1);
           const gradient = data
             .map((color, index) => {
-              return `${darken(color.hex, 0.7)} ${steps * index}%`;
+              // return `${darken(color.hex, 0.7)} ${steps * index}%`;
+              return `${darken(color.hex, 0.1)}`;
             })
             .join(', ');
 
@@ -77,6 +78,8 @@ const MusicContainer = () => {
         });
     }
   }, [imageUrl]);
+
+  console.log('gradient', gradient)
 
   return (
     <MusicContextProvider
@@ -158,22 +161,26 @@ const AudioContainer = styled.div<AudioContainerProps>`
     content: '';
     /* Make the pseudo-element bigger than the container */
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    top: 10%;
+    left: 10%;
+    --size: 80%;
+    width: var(--size);
+    height: var(--size);
 
-    /* The gradient background */
-    background: ${({ $gradient }) =>
+    /* background: ${({ $gradient }) =>
       $gradient
         ? `linear-gradient(0deg, ${$gradient})`
-        : 'linear-gradient(0deg, rgba(40, 48, 3, 1) 0%, rgba(64, 59, 52, 1) 20%, rgba(34, 39, 43, 1) 40%, rgba(20, 21, 14, 1) 60%, rgba(76, 76, 76, 1) 80%, rgba(0, 0, 0, 1) 100%);'};
+        : 'linear-gradient(0deg, rgba(40, 48, 3, 1) 0%, rgba(64, 59, 52, 1) 20%, rgba(34, 39, 43, 1) 40%, rgba(20, 21, 14, 1) 60%, rgba(76, 76, 76, 1) 80%, rgba(0, 0, 0, 1) 100%);'}; */
 
-    /* Rotate around the center of the pseudo-element */
+
+    filter: blur(calc(var(--size) / 5));
+    background-image: ${({$gradient}) => $gradient ? `linear-gradient(${$gradient});` : 'linear-gradient(#4377ef, #7befd0)'};
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     transform-origin: center center;
 
     /* The rotation animation */
-    animation: rotateGradient 45s ease-in-out infinite;
+    animation: rotateGradient 300s ease-in-out infinite;    
+    /* The rotation animation */
     z-index: -1;
   }
 
@@ -207,8 +214,8 @@ const AudioContainer = styled.div<AudioContainerProps>`
 `;
 
 const BlurLayer = styled.div`
-  backdrop-filter: blur(15px);
-  background-color: var(--shade-1);
+  backdrop-filter: blur(200px);
+  /* background-color: var(--shade-1); */
   min-height: 100vh;
 `;
 
