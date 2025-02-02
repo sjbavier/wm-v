@@ -1,42 +1,43 @@
+import { Alert, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { FC, useState, useContext } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { IAuthContext, TLoginResponse, TRequest } from '../models/global';
-import { AuthContext } from '../components/auth/AuthContext';
-import useClient from '../hooks/useClient';
-import { AUTH_ACTION } from '../constants/constants';
-import { PERMISSION } from '../lib/Permissions';
+import { NeuButton } from '../../components/button/NeuButton';
+import { AUTH_ACTION, PERMISSION } from '../../constants/constants';
+import useClient from '../../hooks/useClient';
+import webmaneLogo from '../../assets/LionHeadLOGO.svg';
+import { AuthContext } from '../../components/auth/AuthContext';
 
-type TFValues = {
-  email: string;
-  password: string;
-};
-
-const LoginForm: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login: FC = () => {
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
   const { dispatchAuth, token } = useContext<IAuthContext>(AuthContext);
   const [redirectTo] = useSearchParams();
   const { fetchMe, loading } = useClient();
 
-  const onEmailChange = (ev: any): void => {
-    setEmail(ev.target.value);
-  };
+  const form = useForm({
+    initialValues: {
+      email: '',
+      password: ''
+    },
+    validate: {}
+  });
 
-  const onPasswordChange = (ev: any): void => {
-    setPassword(ev.target.value);
-  };
+  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formRawData = new FormData(event.target as HTMLFormElement); // Create a FormData object from the form
 
-  const formSubmit = async (values: TFValues) => {
+    // Extract values using FormData API
+    const email = formRawData.get('email') as string;
+    const password = formRawData.get('password') as string;
     setErr('');
     setMsg('');
     setMsg('Submitting');
     let formData = {
-      email: values.email,
-      password: values.password
+      email: email,
+      password: password
     };
     const request: TRequest = {
       method: 'POST',
@@ -44,7 +45,7 @@ const LoginForm: FC = () => {
       data: formData
     };
     if (!loading) {
-      const response: TLoginResponse = await fetchMe(request);
+      const response: TLoginResponse | undefined = await fetchMe(request);
       if (response?.access_token) {
         setMsg('');
         dispatchAuth({
@@ -67,11 +68,7 @@ const LoginForm: FC = () => {
 
   if (token && !loading) {
     let redirect: string | null = redirectTo.get('redirectTo');
-    return redirect ? (
-      <Navigate to={redirect} />
-    ) : (
-      <Navigate to="/bookmarks/page/1/page_size/10" />
-    );
+    return redirect ? <Navigate to={redirect} /> : <Navigate to="/reference" />;
   } else {
     return (
       <div className="flex flex-col flex-nowrap justify-center items-center h-screen">
@@ -80,7 +77,7 @@ const LoginForm: FC = () => {
             <div>
               <img
                 className="max-w-[100px] w-full pb-8"
-                // src={webmaneLogo}
+                src={webmaneLogo}
                 alt="webmane logo"
               />
             </div>
@@ -88,8 +85,24 @@ const LoginForm: FC = () => {
               <h1>Login</h1>
             </div>
           </div>
-          <Form onFinish={(values: TFValues) => formSubmit(values)}>
-            <Form.Item
+          <form onSubmit={(values) => formSubmit(values)}>
+            <TextInput
+              placeholder="email"
+              withAsterisk
+              type="email"
+              name="email"
+              {...form.getInputProps('email')}
+            />
+
+            <TextInput
+              placeholder="password"
+              withAsterisk
+              type="password"
+              name="password"
+              {...form.getInputProps('password')}
+            />
+
+            {/* <Form.Item
               name="email"
               rules={[
                 { required: true },
@@ -128,21 +141,18 @@ const LoginForm: FC = () => {
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                 }
               />
-            </Form.Item>
-            <Form.Item label="">
-              <NeuButton
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                disabled={loading}
-                className="w-full"
-              >
-                Login
-              </NeuButton>
-            </Form.Item>
-          </Form>
-          {msg && <Alert message={msg} type="success" />}
-          {err && <Alert message={err} type="error" />}
+            </Form.Item> */}
+            <NeuButton
+              type="submit"
+              loading={loading}
+              disabled={loading}
+              className="w-full"
+            >
+              Login
+            </NeuButton>
+          </form>
+          {msg && <Alert color="green">{msg}</Alert>}
+          {err && <Alert color="red">{err}</Alert>}
         </LoginContainer>
       </div>
     );
@@ -158,4 +168,4 @@ const LoginContainer = styled.div`
   padding: 2.5rem;
 `;
 
-export default LoginForm;
+export default Login;
