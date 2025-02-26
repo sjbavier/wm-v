@@ -50,3 +50,8 @@ export const PERMISSION = {
   [ROLES.Editor]: [SCOPES.canRead, SCOPES.canWrite],
   [ROLES.Admin]: [SCOPES.canRead, SCOPES.canWrite, SCOPES.canExecute]
 };
+
+export const enum Layout {
+  GRID = 'Grid',
+  ROW = 'Row'
+}

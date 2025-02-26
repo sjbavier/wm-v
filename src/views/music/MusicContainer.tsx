@@ -11,6 +11,7 @@ import { MusicContextProvider } from '../../providers/useMusicContext';
 import useMediaQuery from '../../hooks/useMediaQuery';
 import { extractColors } from 'extract-colors';
 import { useBase64ToImage } from '../../hooks/useBase64ToImage';
+import { Layout } from '../../constants/constants';
 
 interface AudioContainerProps {
   $coverArt?: string;
@@ -30,6 +31,7 @@ const MusicContainer = () => {
   const [page, setPage] = useState(0);
 
   const [searchText] = useDebouncedValue(search, 500);
+  const [layout, setLayout] = useState<Layout | undefined>(Layout.GRID);
 
   const {
     data,
@@ -79,11 +81,19 @@ const MusicContainer = () => {
     }
   }, [imageUrl]);
 
-  console.log('gradient', gradient)
-
   return (
     <MusicContextProvider
-      value={{ screenSize, search, setSearch, song, setSong, page, setPage }}
+      value={{
+        screenSize,
+        search,
+        setSearch,
+        song,
+        setSong,
+        page,
+        setPage,
+        layout,
+        setLayout
+      }}
     >
       <AudioContainer $coverArt={song?.cover_art} $gradient={gradient}>
         <BlurLayer>
@@ -172,14 +182,16 @@ const AudioContainer = styled.div<AudioContainerProps>`
         ? `linear-gradient(0deg, ${$gradient})`
         : 'linear-gradient(0deg, rgba(40, 48, 3, 1) 0%, rgba(64, 59, 52, 1) 20%, rgba(34, 39, 43, 1) 40%, rgba(20, 21, 14, 1) 60%, rgba(76, 76, 76, 1) 80%, rgba(0, 0, 0, 1) 100%);'}; */
 
-
     filter: blur(calc(var(--size) / 5));
-    background-image: ${({$gradient}) => $gradient ? `linear-gradient(${$gradient});` : 'linear-gradient(#4377ef, #7befd0)'};
+    background-image: ${({ $gradient }) =>
+      $gradient
+        ? `linear-gradient(${$gradient});`
+        : 'linear-gradient(#4377ef, #7befd0)'};
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     transform-origin: center center;
 
     /* The rotation animation */
-    animation: rotateGradient 300s ease-in-out infinite;    
+    animation: rotateGradient 300s ease-in-out infinite;
     /* The rotation animation */
     z-index: -1;
   }

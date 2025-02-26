@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import useAudio from '../../hooks/useAudio';
 import { Slider, alpha, darken, lighten } from '@mantine/core';
 import { useThrottledState } from '@mantine/hooks';
-import LayoutOptions from '../music_grid/LayoutOptions';
 import MusicSearch from './MusicSearch';
 import { Size } from '../../hooks/useMediaQuery';
 import useMusicContext from '../../providers/useMusicContext';
@@ -166,7 +165,6 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
           )}
         </ControlButton>
       </ControlsWrapper>
-      <LayoutOptions />
     </AudioPlayerContainer>
   );
 };

@@ -3,6 +3,7 @@ import Render from '../render/Render';
 import { Size } from '../../hooks/useMediaQuery';
 import { useMemo } from 'react';
 import useMusicContext from '../../providers/useMusicContext';
+import LayoutOptions from './LayoutOptions';
 
 interface MusicGridProps {
   data: undefined | Song[];
@@ -37,6 +38,7 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
 
   return (
     <Render if={Array.isArray(data) && data.length > 0}>
+      <LayoutOptions />
       <MusicGridContainer>
         {data?.map((s: Song) => {
           const pathLength = s?.path?.split('/')?.length;
