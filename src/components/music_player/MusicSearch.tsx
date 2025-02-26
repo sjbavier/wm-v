@@ -68,7 +68,8 @@ const SearchWrapper = styled.div<SearchWrapperProps>`
     padding: 0.7rem;
     border-radius: 1.2rem;
 
-    background: ${darken('var(--mantine-color-green-3)', 0.88)};
+    /* background: ${darken('var(--mantine-color-green-3)', 0.88)}; */
+    background: var(--shade-1);
     border-width: 1px;
     border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
     /* color: ${({ $searchOpen }) => ($searchOpen ? '22rem' : '2.4rem')}; */

@@ -223,7 +223,8 @@ const ControlButton = styled.div`
   border-radius: 50%;
   font-weight: 700;
   border-width: 1px;
-  background: ${darken('var(--mantine-color-green-3)', 0.88)};
+  background: transparent;
+  background: var(--shade-1);
   border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
   color: ${lighten('var(--mantine-color-green-5)', 0.1)};
   & > svg {

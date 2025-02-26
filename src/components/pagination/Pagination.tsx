@@ -128,7 +128,7 @@ const PageSizeOptions = ({
 const SelectStyled = styled(Select)`
   background-color: transparent;
   .mantine-Select-input {
-    background: ${darken('var(--mantine-color-green-3)', 0.88)};
+    background: var(--shade-1);
     border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
     color: ${lighten('var(--mantine-color-green-5)', 0.1)};
     &::before,
@@ -159,7 +159,9 @@ const ReactPaginateContainer = styled.div`
   justify-content: space-between;
   font-size: 0.875rem;
   .mantine-Popover-dropdown {
-    background: rgba(255, 255, 255, 0.1);
+    /* background: rgba(255, 255, 255, 0.1); */
+
+    background: var(--shade-2);
     color: rgba(255, 255, 255, 0.88);
     border-color: rgba(255, 255, 255, 0.2);
     &::before,
@@ -167,8 +169,9 @@ const ReactPaginateContainer = styled.div`
       border-color: rgba(255, 255, 255, 0.2);
     }
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+      background: ${darken('var(--mantine-color-green-3)', 0.83)};
+      border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
     }
     &:focus {
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -192,9 +195,9 @@ const ReactPaginateContainer = styled.div`
     li {
       &.active {
         a {
-          color: ${lighten('var(--mantine-color-green-5)', 0.3)};
-          background: ${darken('var(--mantine-color-green-3)', 0.83)};
-          border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+          background: var(--shade-2);
+          border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+          color: ${lighten('var(--mantine-color-green-5)', 0.1)};
         }
       }
       a {
@@ -214,9 +217,9 @@ const ReactPaginateContainer = styled.div`
         font-weight: 500;
         border: 1px solid rgba(255, 255, 255, 0.3);
         &:hover {
-          color: ${lighten('var(--mantine-color-green-5)', 0.1)};
-          background: ${darken('var(--mantine-color-green-3)', 0.88)};
-          border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+          color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+          background: ${darken('var(--mantine-color-green-3)', 0.83)};
+          border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
         }
       }
       margin-top: 0;

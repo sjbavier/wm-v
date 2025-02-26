@@ -63,9 +63,9 @@ const MusicContainer = () => {
       extractColors(imageUrl, options)
         .then((data) => {
           console.log('extract', data);
-          const steps = 100 / (data.length - 1);
+          // const steps = 100 / (data.length - 1);
           const gradient = data
-            .map((color, index) => {
+            .map((color, _index) => {
               // return `${darken(color.hex, 0.7)} ${steps * index}%`;
               return `${darken(color.hex, 0.1)}`;
             })
@@ -145,7 +145,7 @@ const StickyContainer = styled.div`
 `;
 
 const AudioContainer = styled.div<AudioContainerProps>`
-  --shade-1: rgba(0, 0, 0, 0.23);
+  --shade-1: rgba(0, 0, 0, 0.15);
   --shade-2: rgba(0, 0, 0, 0.43);
   --shade-3: rgba(0, 0, 0, 0.53);
   --shade-4: rgba(0, 0, 0, 0.86);
