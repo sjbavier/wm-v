@@ -1,9 +1,6 @@
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
-import { useState } from 'react';
 import styled from 'styled-components';
-import useAudio from '../../hooks/useAudio';
 import { Slider, alpha, darken, lighten } from '@mantine/core';
-import { useThrottledState } from '@mantine/hooks';
 import MusicSearch from './MusicSearch';
 import { Size } from '../../hooks/useMediaQuery';
 import useMusicContext from '../../providers/useMusicContext';
@@ -16,73 +13,20 @@ interface MusicPlayerProps {
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-// Helper function to format time in seconds to mm:ss
-const formatTime = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-};
-
-// Helper function to parse mm:ss to seconds
-// const parseTime = (time: string): number => {
-//   const [minutes, seconds] = time.split(':').map(Number);
-//   return minutes * 60 + seconds;
-// };
-
 const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
-  const { screenSize } = useMusicContext();
-  const { isPlaying, audioRef, handlePlayClick } = useAudio({
-    musicSrc
-  });
-  const [currentTime, setCurrentTime] = useThrottledState(0, 1000);
-  const [duration, setDuration] = useState(0);
-  const [marks, setMarks] = useState<
-    | {
-        value: number;
-        label?: React.ReactNode;
-      }[]
-    | undefined
-  >(undefined);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-      requestAnimationFrame(handleTimeUpdate);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-      setMarks([
-        {
-          value: Math.floor(audioRef.current.duration / 4),
-          label: `${formatTime(Math.floor(audioRef.current.duration / 4))}`
-        },
-        {
-          value: Math.floor(audioRef.current.duration / 2),
-          label: `${formatTime(Math.floor(audioRef.current.duration / 2))}`
-        },
-        {
-          value: Math.floor((audioRef.current.duration / 4) * 3),
-          label: `${formatTime(
-            Math.floor((audioRef.current.duration / 4) * 3)
-          )}`
-        },
-        {
-          value: audioRef.current.duration,
-          label: `${formatTime(audioRef.current.duration)}`
-        }
-      ]);
-    }
-  };
-
-  const handleSliderChange = (value: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value;
-      setCurrentTime(value);
-    }
-  };
+  const {
+    screenSize,
+    isPlaying,
+    audioRef,
+    handlePlayClick,
+    currentTime,
+    duration,
+    marks,
+    handleTimeUpdate,
+    handleLoadedMetadata,
+    handleSliderChange,
+    formatTime
+  } = useMusicContext();
 
   const pathLength = song?.path?.split('/')?.length;
   const pathArray = song?.path?.split('/');

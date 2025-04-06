@@ -13,6 +13,30 @@ export interface MusicContextProps {
   setSong?: React.Dispatch<React.SetStateAction<Song | undefined>>;
   layout?: Layout | undefined;
   setLayout?: React.Dispatch<React.SetStateAction<Layout | undefined>>;
+  // useAudio
+  isPlaying: boolean;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  handlePlayClick: () => void;
+  toggleIsPlaying: () => void;
+  currentTime: number;
+  setCurrentTime: (newValue: React.SetStateAction<number>) => void;
+  duration: number;
+  setDuration: React.Dispatch<React.SetStateAction<number>>;
+  marks:
+    | {
+        value: number;
+        label?: React.ReactNode;
+      }[]
+    | undefined;
+  setMarks: React.Dispatch<
+    React.SetStateAction<
+      { value: number; label?: React.ReactNode }[] | undefined
+    >
+  >;
+  handleTimeUpdate: () => void;
+  formatTime: (seconds: number) => string;
+  handleLoadedMetadata: () => void;
+  handleSliderChange: (value: number) => void;
 }
 
 const MusicContext = React.createContext<MusicContextProps>({});

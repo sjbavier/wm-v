@@ -48,7 +48,6 @@ export default function useMusic({
   const totalPageCount: number = useMemo(() => {
     return Math.ceil(data?.music?.totalItemsCount / pageSize);
   }, [data?.music?.totalItemsCount]);
-  console.log('data', data);
   return {
     totalItemsCount: data?.music?.totalItemsCount,
     totalPageCount,

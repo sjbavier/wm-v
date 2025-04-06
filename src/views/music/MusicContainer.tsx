@@ -12,6 +12,7 @@ import useMediaQuery from '../../hooks/useMediaQuery';
 import { extractColors } from 'extract-colors';
 import { useBase64ToImage } from '../../hooks/useBase64ToImage';
 import { Layout } from '../../constants/constants';
+import useAudio from '../../hooks/useAudio';
 
 interface AudioContainerProps {
   $coverArt?: string;
@@ -27,6 +28,25 @@ const MusicContainer = () => {
   const musicSrc = useMemo(() => {
     return `${baseUrl}music?id=${song?.id}`;
   }, [song]);
+
+  const {
+    isPlaying,
+    toggleIsPlaying,
+    audioRef,
+    handlePlayClick,
+    currentTime,
+    setCurrentTime,
+    duration,
+    setDuration,
+    marks,
+    setMarks,
+    handleTimeUpdate,
+    formatTime,
+    handleLoadedMetadata,
+    handleSliderChange
+  } = useAudio({
+    musicSrc
+  });
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -92,7 +112,21 @@ const MusicContainer = () => {
         page,
         setPage,
         layout,
-        setLayout
+        setLayout,
+        isPlaying,
+        toggleIsPlaying,
+        audioRef,
+        handlePlayClick,
+        currentTime,
+        setCurrentTime,
+        duration,
+        setDuration,
+        marks,
+        setMarks,
+        handleTimeUpdate,
+        formatTime,
+        handleLoadedMetadata,
+        handleSliderChange
       }}
     >
       <AudioContainer $coverArt={song?.cover_art} $gradient={gradient}>
