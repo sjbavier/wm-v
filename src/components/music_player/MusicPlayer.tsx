@@ -1,9 +1,16 @@
-import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
+import {
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconVolume,
+  IconVolume2,
+  IconVolumeOff
+} from '@tabler/icons-react';
 import styled from 'styled-components';
-import { Slider, alpha, darken, lighten } from '@mantine/core';
+import { Slider, alpha, darken, lighten, AngleSlider } from '@mantine/core';
 import MusicSearch from './MusicSearch';
 import { Size } from '../../hooks/useMediaQuery';
 import useMusicContext from '../../providers/useMusicContext';
+import { useEffect, useState } from 'react';
 
 interface MusicPlayerProps {
   musicSrc: string;
@@ -27,6 +34,44 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
     handleSliderChange,
     formatTime
   } = useMusicContext();
+
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      const clampedVolume = Math.max(0, Math.min(1, volume));
+      audioRef.current.volume = clampedVolume;
+      audioRef.current.muted = isMuted;
+    }
+  }, [volume, isMuted, audioRef]);
+
+  const handleVolumeChange = (angle: number) => {
+    // Convert the angle (0-360) to a volume (0-1)
+    const newVolume = angle / 360;
+    // Ensure the value is within the valid range [0, 1]
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    setVolume(clampedVolume);
+    if (clampedVolume === 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+    }
+  };
+
+  const handleMuteClick = () => {
+    setIsMuted(!isMuted);
+    if (!isMuted) {
+      setVolume(0);
+    } else {
+      setVolume(1);
+    }
+  };
+
+  // Function to format the volume as an angle for the AngleSlider
+  const formatVolumeAsAngle = (vol: number) => {
+    return vol * 360;
+  };
 
   const pathLength = song?.path?.split('/')?.length;
   const pathArray = song?.path?.split('/');
@@ -81,7 +126,6 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             max={duration}
             value={currentTime}
             label={formatTime}
-            // labelAlwaysOn
             size={2}
             marks={marks}
             thumbSize={
@@ -102,13 +146,32 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             doesn't work
           </AudioPlayer>
         </ControlsContainer>
-        <ControlButton className="large" onClick={handlePlayClick}>
-          {isPlaying ? (
-            <IconPlayerPause stroke={`1`} />
-          ) : (
-            <IconPlayerPlay stroke={`1`} />
-          )}
-        </ControlButton>
+        <VolumeControls>
+          <StyledAngleSlider
+            step={1} // Adjust step as needed for finer control
+            size={50}
+            value={formatVolumeAsAngle(volume)}
+            onChange={handleVolumeChange}
+            formatLabel={(value) => `${Math.round(value / 3.6)}`}
+            thumbSize={15}
+          />
+          <ControlButton className="small" onClick={handleMuteClick}>
+            {isMuted || volume === 0 ? (
+              <IconVolumeOff stroke={`1`} />
+            ) : volume > 0.5 ? (
+              <IconVolume stroke={`1`} />
+            ) : (
+              <IconVolume2 stroke={`1`} />
+            )}
+          </ControlButton>
+          <ControlButton className="large" onClick={handlePlayClick}>
+            {isPlaying ? (
+              <IconPlayerPause stroke={`1`} />
+            ) : (
+              <IconPlayerPlay stroke={`1`} />
+            )}
+          </ControlButton>
+        </VolumeControls>
       </ControlsWrapper>
     </AudioPlayerContainer>
   );
@@ -162,7 +225,7 @@ const ControlButton = styled.div`
   cursor: pointer;
   width: 50px;
   height: 50px;
-  margin-left: 1.4rem;
+  /* margin-left: 1.4rem; */
   border-radius: 50%;
   font-weight: 700;
   border-width: 1px;
@@ -190,6 +253,14 @@ const ControlButton = styled.div`
       height: 1.4rem;
     }
   }
+  &.small {
+    width: 35px;
+    height: 35px;
+    & > svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
   &:hover {
     color: ${lighten('var(--mantine-color-green-5)', 0.3)};
     background: ${darken('var(--mantine-color-green-3)', 0.83)};
@@ -213,6 +284,28 @@ const StyledSlider = styled(Slider)`
 
 const AudioPlayer = styled.audio`
   display: none;
+`;
+
+const VolumeControls = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  gap: 0.5rem;
+`;
+
+const StyledAngleSlider = styled(AngleSlider)`
+  background: var(--shade-1);
+  border-width: 1px;
+  border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
+  color: ${lighten('var(--mantine-color-green-5)', 0.1)};
+  .mantine-AngleSlider-track {
+    background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+  }
+  .mantine-AngleSlider-thumb {
+    &::before {
+      background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+    }
+  }
 `;
 
 export default MusicPlayer;

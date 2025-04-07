@@ -98,6 +98,7 @@ const MusicContainer = () => {
         });
     }
   }, [imageUrl]);
+  console.log('audioRef', audioRef);
 
   return (
     <MusicContextProvider

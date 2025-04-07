@@ -67,7 +67,28 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
                 >
                   <Darken $coverArt={s?.cover_art}>
                     <SongInfoChunk>{artist}</SongInfoChunk>
-                    <SongInfoChunk className="title">{title}</SongInfoChunk>
+                    <SongInfoChunk className="title">
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <ControlButton
+                          className="small"
+                          onClick={handlePlayClick}
+                        >
+                          {isPlaying && song?.id === s.id ? (
+                            <IconPlayerPause stroke={`1`} />
+                          ) : (
+                            <IconPlayerPlay stroke={`1`} />
+                          )}
+                        </ControlButton>
+
+                        {title}
+                      </div>
+                    </SongInfoChunk>
 
                     <SongMetaData>
                       <SongInfoChunk>
@@ -87,10 +108,7 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
                   $coverArt={s?.cover_art}
                 >
                   <CompactDarken $coverArt={s?.cover_art}>
-                    <ControlButton
-                      className="large"
-                      onClick={() => handlePlayClick()}
-                    >
+                    <ControlButton className="large" onClick={handlePlayClick}>
                       {isPlaying && song?.id === s.id ? (
                         <IconPlayerPause stroke={`1`} />
                       ) : (
@@ -175,6 +193,16 @@ const ControlButton = styled.div`
     width: 1.2rem;
     height: 1.2rem;
   }
+  &.small {
+    min-width: 35px;
+    min-height: 35px;
+    width: 35px;
+    height: 35px;
+    & > svg {
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
   &.large {
     @media screen and (max-width: 768px) {
       width: 35px;
@@ -199,6 +227,7 @@ const ControlButton = styled.div`
 `;
 
 const CompactRow = styled.div<SongRowProps>`
+  position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -208,7 +237,7 @@ const CompactRow = styled.div<SongRowProps>`
   cursor: pointer;
   background: ${({ $coverArt }) =>
     $coverArt
-      ? `url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
+      ? `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
       : 'var(--shade-1)'};
   background-size: cover;
   width: 100%;
@@ -216,6 +245,15 @@ const CompactRow = styled.div<SongRowProps>`
   margin-block: 0.2rem;
   margin-inline: 0.2rem;
   border-radius: 0.4rem;
+  transition: all 500ms ease-in-out;
+  &:hover {
+    background: ${({ $coverArt }) =>
+      $coverArt
+        ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(data:image/jpeg;base64,${$coverArt}) no-repeat center center`
+        : 'var(--shade-2)'};
+    background-size: cover;
+    /* transform: scale(1.002); */
+  }
 `;
 const CompactSongInfo = styled.div`
   width: 100%;
@@ -238,9 +276,11 @@ const Darken = styled.div<DarkenProps>`
   width: 100%;
 `;
 const SongInfoChunk = styled.div`
-  padding: 0.8rem;
+  padding: 0.6rem;
   word-break: break-all;
-  /* background-color: var(--shade-3); */
+  display: inline-flex;
+  align-items: center;
+  justify-content: start;
   &.title {
     font-size: 0.95rem;
     width: 100%;
