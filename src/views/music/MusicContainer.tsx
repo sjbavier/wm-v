@@ -44,9 +44,7 @@ const MusicContainer = () => {
     formatTime,
     handleLoadedMetadata,
     handleSliderChange
-  } = useAudio({
-    musicSrc
-  });
+  } = useAudio();
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(0);
 

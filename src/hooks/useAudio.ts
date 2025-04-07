@@ -2,12 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToggle } from './useToggle';
 import { useThrottledState } from '@mantine/hooks';
 
-interface UseAudioProps {
-  musicSrc: string;
-}
-export default function useAudio({ musicSrc }: UseAudioProps) {
+export default function useAudio() {
   const [isPlaying, toggleIsPlaying] = useToggle(false);
-  const [currentTime, setCurrentTime] = useThrottledState(0, 1000);
+  const [currentTime, setCurrentTime] = useThrottledState(0, 500);
   const [duration, setDuration] = useState(0);
   const [marks, setMarks] = useState<
     | {
@@ -18,12 +15,18 @@ export default function useAudio({ musicSrc }: UseAudioProps) {
   >(undefined);
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const handlePlayClick = () => {
     if (!audioRef.current) return;
-
-    console.log('audioref', audioRef);
     toggleIsPlaying();
+  };
+
+  const updateCurrentTime = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
+    }
   };
 
   useEffect(() => {
@@ -32,19 +35,21 @@ export default function useAudio({ musicSrc }: UseAudioProps) {
     }
     if (isPlaying) {
       audioRef.current.play();
-      console.log('audio ref pausing');
+      // start animation loop
+      animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
     } else {
-      console.log('audio ref play');
       audioRef.current.pause();
+      if (animationFrameRef.current) {
+        // stop animation frame running during pausing
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     }
   }, [isPlaying]);
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      console.log('time update', audioRef.current.currentTime);
-      setCurrentTime(audioRef.current.currentTime);
-      requestAnimationFrame(handleTimeUpdate);
-    }
+    // This function is now only responsible for updating the state
+    // The actual time update is handled by the onTimeUpdate event
   };
 
   // Helper function to format time in seconds to mm:ss
@@ -86,6 +91,14 @@ export default function useAudio({ musicSrc }: UseAudioProps) {
       setCurrentTime(value);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
 
   return {
     isPlaying,

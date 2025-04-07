@@ -81,11 +81,11 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             max={duration}
             value={currentTime}
             label={formatTime}
-            labelAlwaysOn
+            // labelAlwaysOn
             size={2}
             marks={marks}
             thumbSize={
-              screenSize === Size.SM || screenSize === Size.XS ? '20' : '10'
+              screenSize === Size.SM || screenSize === Size.XS ? '10' : '15'
             }
             onChange={(value) => {
               handleSliderChange(value);
@@ -95,6 +95,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             src={musicSrc}
             controls
             ref={audioRef}
+            // only needed to trigger state update
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
           >
