@@ -47,7 +47,7 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(229deg 24% 10%);
   }
-  *::-webkit-scrollbar {
+  /* *::-webkit-scrollbar {
     width: 0.8rem;
   }
   *::-webkit-scrollbar-track {
@@ -58,5 +58,44 @@
   }
   *::-webkit-scrollbar-thumb:hover {
     background: hsl(231deg 18% 20%);
+  } */
+
+  /* Custom Scrollbar Styles */
+  /* For Webkit-based browsers (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    width: 8px; /* Adjust the width as needed */
+    height: 8px; /* Adjust the height as needed */
   }
+
+  *::-webkit-scrollbar-track {
+    background: var(
+      --shade-1
+    ); /* Dark background color, similar to your player */
+    border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(
+      var(--mantine-color-green-6-rgb),
+      0.88
+    ); /* Green accent color, semi-transparent */
+    border-radius: 4px;
+    border: 1px solid var(--shade-1); /* Add a border to the thumb */
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(
+      var(--mantine-color-green-6-rgb),
+      0.66
+    ); /* Darker green on hover */
+  }
+
+  /* For Firefox */
+  /* Note: Firefox's scrollbar styling is more limited */
+  /* You can use the `scrollbar-color` property, but it's less customizable */
+  /* You can also use the `scrollbar-width` property */
+  /* html {
+  scrollbar-color: rgba(var(--mantine-color-green-6-rgb), 0.88) var(--shade-1);
+  scrollbar-width: thin;
+} */
 }

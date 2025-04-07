@@ -149,7 +149,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
         <VolumeControls>
           <StyledAngleSlider
             step={1} // Adjust step as needed for finer control
-            size={50}
+            size={65}
             value={formatVolumeAsAngle(volume)}
             onChange={handleVolumeChange}
             formatLabel={(value) => `${Math.round(value / 3.6)}`}
@@ -179,7 +179,6 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
 const AudioPlayerContainer = styled.div`
   width: 100%;
   display: flex;
-  /* flex-direction: column; */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.8rem 1rem;
   align-items: center;
@@ -225,7 +224,6 @@ const ControlButton = styled.div`
   cursor: pointer;
   width: 50px;
   height: 50px;
-  /* margin-left: 1.4rem; */
   border-radius: 50%;
   font-weight: 700;
   border-width: 1px;
@@ -294,16 +292,27 @@ const VolumeControls = styled.div`
 `;
 
 const StyledAngleSlider = styled(AngleSlider)`
+  cursor: pointer;
   background: var(--shade-1);
   border-width: 1px;
   border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
   color: ${lighten('var(--mantine-color-green-5)', 0.1)};
-  .mantine-AngleSlider-track {
-    background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+  &:hover {
+    color: ${lighten('var(--mantine-color-green-5)', 0.3)};
+    background: ${darken('var(--mantine-color-green-3)', 0.83)};
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+    .mantine-AngleSlider-thumb {
+      &::before {
+        background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+      }
+    }
   }
+  /* .mantine-AngleSlider-track {
+    background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+  } */
   .mantine-AngleSlider-thumb {
     &::before {
-      background-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+      background-color: ${alpha('var(--mantine-color-green-6)', 0.66)};
     }
   }
 `;
