@@ -172,7 +172,9 @@ const MusicContainer = () => {
             </div>
           </Render>
           {/* music list  */}
-          <MusicGrid data={data} setSong={setSong} />
+          <MusicGridContainer>
+            <MusicGrid data={data} setSong={setSong} />
+          </MusicGridContainer>
         </BlurLayer>
       </AudioContainer>
     </MusicContextProvider>
@@ -183,8 +185,10 @@ const StickyContainer = styled.div`
   position: sticky;
   top: 0;
   left: 0;
+  width: 100%; /* Ensure it takes full width */
   backdrop-filter: brightness(0.05%);
   z-index: 100;
+  background-color: var(--shade-1);
 `;
 
 const AudioContainer = styled.div<AudioContainerProps>`
@@ -194,11 +198,12 @@ const AudioContainer = styled.div<AudioContainerProps>`
   --shade-4: rgba(0, 0, 0, 0.86);
 
   margin-left: 48px;
-  min-height: 100%;
-
-  /* Wrap in a pseudo-element to allow rotation */
+  min-height: 100vh; /* Use viewport height for full-screen */
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* Wrap in a pseudo-element to allow rotation */
 
   &:before {
     content: '';
@@ -262,6 +267,14 @@ const BlurLayer = styled.div`
   backdrop-filter: blur(200px);
   /* background-color: var(--shade-1); */
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Enable vertical scrolling */
+`;
+
+const MusicGridContainer = styled.div`
+  flex-grow: 1; /* Allow MusicGrid to take up remaining space */
+  overflow-y: auto; /* Enable scrolling within MusicGrid */
 `;
 
 export default MusicContainer;
