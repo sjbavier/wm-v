@@ -1,9 +1,9 @@
 import { alpha, darken, lighten } from '@mantine/core';
 import { IconLayoutGrid, IconLayoutList } from '@tabler/icons-react';
 import styled from 'styled-components';
-import useElementHeight from '../../hooks/useElementHeight';
-import useMusicContext from '../../providers/useMusicContext';
-import { Layout } from '../../constants/constants';
+import useElementHeight from '../../../hooks/useElementHeight';
+import useMusicContext from '../../../providers/useMusicContext';
+import { Layout } from '../../../constants/constants';
 
 interface LayoutOptionsProps {
   $height?: number;

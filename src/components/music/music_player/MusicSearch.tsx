@@ -7,9 +7,9 @@ import {
   lighten
 } from '@mantine/core';
 import styled from 'styled-components';
-import useMusicContext from '../../providers/useMusicContext';
-import { useToggle } from '../../hooks/useToggle';
-import Render from '../render/Render';
+import useMusicContext from '../../../providers/useMusicContext';
+import { useToggle } from '../../../hooks/useToggle';
+import Render from '../../render/Render';
 import { IconSearch } from '@tabler/icons-react';
 
 interface MusicSearchProps {

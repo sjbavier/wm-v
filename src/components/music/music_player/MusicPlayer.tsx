@@ -8,8 +8,8 @@ import {
 import styled from 'styled-components';
 import { Slider, alpha, darken, lighten, AngleSlider } from '@mantine/core';
 import MusicSearch from './MusicSearch';
-import { Size } from '../../hooks/useMediaQuery';
-import useMusicContext from '../../providers/useMusicContext';
+import { Size } from '../../../hooks/useMediaQuery';
+import useMusicContext from '../../../providers/useMusicContext';
 import { useEffect, useState } from 'react';
 
 interface MusicPlayerProps {

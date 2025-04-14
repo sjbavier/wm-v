@@ -1,12 +1,13 @@
 import styled from 'styled-components';
-import Render from '../render/Render';
-import { Size } from '../../hooks/useMediaQuery';
+import Render from '../../render/Render';
+import { Size } from '../../../hooks/useMediaQuery';
 import { useMemo } from 'react';
-import useMusicContext from '../../providers/useMusicContext';
+import useMusicContext from '../../../providers/useMusicContext';
 import LayoutOptions from './LayoutOptions';
-import { Layout } from '../../constants/constants';
+import { Layout } from '../../../constants/constants';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
 import { alpha, darken, lighten } from '@mantine/core';
+import PlayListControls from './playlist-controls/PlayListControls';
 
 interface MusicGridProps {
   data: undefined | Song[];
@@ -119,6 +120,7 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
                       <CompactSongInfo>{artist}</CompactSongInfo>
                       <CompactSongInfo>{title}</CompactSongInfo>
                     </div>
+                    <PlayListControls style={{ marginLeft: 'auto' }} song={s} />
                   </CompactDarken>
                 </CompactRow>
               </Render>
@@ -177,9 +179,6 @@ const ControlButton = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  /* width: 50px;
-  height: 50px; */
-  /* margin-left: 1.4rem; */
   margin-block: 0.2rem;
   margin-right: 0.6rem;
   border-radius: 50%;
@@ -205,11 +204,11 @@ const ControlButton = styled.div`
   }
   &.large {
     @media screen and (max-width: 768px) {
-      width: 35px;
-      height: 35px;
+      min-width: 35px;
+      min-height: 35px;
     }
-    width: 45px;
-    height: 45px;
+    min-width: 45px;
+    min-height: 45px;
     & > svg {
       @media screen and (max-width: 768px) {
         width: 1.4rem;
@@ -259,13 +258,11 @@ const CompactSongInfo = styled.div`
   width: 100%;
 `;
 const CompactDarken = styled.div<DarkenProps>`
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  align-items: center;
   width: 100%;
   padding: 0.3rem 0.5rem;
-  /* background-color: ${({ $coverArt }) =>
-    $coverArt ? 'var(--shade-1)' : ''}; */
 `;
 const Darken = styled.div<DarkenProps>`
   display: flex;
