@@ -62,7 +62,7 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
               <Render if={layout === Layout.GRID}>
                 <SongRow
                   onClick={() => setSong(s)}
-                  key={crypto.randomUUID()}
+                  key={s?.id?.toString()}
                   $col={columnPercentage}
                   $coverArt={s?.cover_art}
                 >
@@ -105,7 +105,8 @@ const MusicGrid = ({ data, setSong }: MusicGridProps) => {
               <Render if={layout === Layout.ROW}>
                 <CompactRow
                   onClick={() => setSong(s)}
-                  key={crypto.randomUUID()}
+                  key={s?.id?.toString()}
+                  $col={columnPercentage}
                   $coverArt={s?.cover_art}
                 >
                   <CompactDarken $coverArt={s?.cover_art}>

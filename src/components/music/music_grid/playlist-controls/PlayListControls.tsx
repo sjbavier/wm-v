@@ -26,7 +26,13 @@ const PlayListControls = ({
             <IconPlaylistAdd />
           </ControlButton>
         </Menu.Target>
-        <Menu.Dropdown></Menu.Dropdown>
+        <Menu.Dropdown>
+          <Menu.Item leftSection={<IconPlaylistAdd />}>
+            Add to Current Playlist
+          </Menu.Item>
+          <Menu.Item>Add to Existing Playlist</Menu.Item>
+          <Menu.Item>Create and Add to New Playlist</Menu.Item>
+        </Menu.Dropdown>
       </Menu>
     </PlayListControlsContainer>
   );
