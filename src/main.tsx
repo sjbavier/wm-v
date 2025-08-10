@@ -9,7 +9,7 @@ import App from './App.tsx';
 import { MantineProvider } from '@mantine/core';
 import { ApolloProvider } from '@apollo/client';
 import { createApolloClient } from './lib/ApolloClient.ts';
-import { customTheme } from './mantine.config.ts';
+import { customTheme } from './mantine.customTheme.ts';
 
 // import { useToggle } from './hooks/useToggle.ts';
 // const [isDark, toggleDark] = useToggle(false);
