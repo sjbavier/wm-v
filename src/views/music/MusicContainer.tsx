@@ -13,6 +13,7 @@ import { extractColors } from 'extract-colors';
 import { useBase64ToImage } from '../../hooks/useBase64ToImage';
 import { Layout } from '../../constants/constants';
 import useAudio from '../../hooks/useAudio';
+import useCoverart from '../../hooks/useCoverart';
 
 interface AudioContainerProps {
   $coverArt?: string;
@@ -49,7 +50,7 @@ const MusicContainer = () => {
   const [page, setPage] = useState(0);
 
   const [searchText] = useDebouncedValue(search, 500);
-  const [layout, setLayout] = useState<Layout | undefined>(Layout.GRID);
+  const [layout, setLayout] = useState<Layout | undefined>(Layout.ROW);
 
   const {
     data,
@@ -64,11 +65,7 @@ const MusicContainer = () => {
     skip: false
   });
 
-  useEffect(() => {
-    if (song?.cover_art) {
-      convertBase64ToImage(song.cover_art, 'image/jpeg');
-    }
-  }, [song]);
+  useCoverart({ song, convertBase64ToImage });
   useEffect(() => {
     const options = {
       pixels: 64000,
