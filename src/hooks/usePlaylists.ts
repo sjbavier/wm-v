@@ -11,6 +11,9 @@ export interface PlaylistSummary {
   songs: PlaylistSongRef[];
   songCount: number;
   hasSelectedSong: boolean;
+  lastUpdate?: string;
+  lastAccessed?: string;
+  cover_art?: string;
 }
 
 interface PlaylistMutationResult {
@@ -24,12 +27,20 @@ interface CreatePlaylistResult extends PlaylistMutationResult {
 
 type SongIdLike = Song['id'] | string | number;
 
+const comparePlaylistNames = (left?: string, right?: string) =>
+  (left || '').localeCompare(right || '', undefined, {
+    sensitivity: 'base'
+  });
+
 export const GET_PLAYLISTS = gql`
   query GetPlaylists {
     playlists {
       playlists {
         id
         name
+        lastUpdate
+        lastAccessed
+        cover_art
         songs {
           id
         }
@@ -63,6 +74,14 @@ const REMOVE_SONG_FROM_PLAYLIST = gql`
   }
 `;
 
+const DELETE_PLAYLIST = gql`
+  mutation DeletePlaylist($playlistId: ID!) {
+    deletePlaylist(playlistId: $playlistId) {
+      id
+    }
+  }
+`;
+
 const UPSERT_PLAYLIST = gql`
   mutation UpsertPlaylist($input: PlaylistInput!) {
     upsertPlaylist(input: $input) {
@@ -86,21 +105,31 @@ export default function usePlaylists({
   const [addSongToPlaylistMutation] = useMutation(ADD_SONG_TO_PLAYLIST);
   const [removeSongFromPlaylistMutation] = useMutation(REMOVE_SONG_FROM_PLAYLIST);
   const [upsertPlaylistMutation] = useMutation(UPSERT_PLAYLIST);
+  const [deletePlaylistMutation] = useMutation(DELETE_PLAYLIST);
 
   const playlists = useMemo<PlaylistSummary[]>(() => {
     const normalizedSelectedSongId = normalizeSongId(selectedSongId);
 
-    return (data?.playlists?.playlists || []).map(
-      (playlist: { id: string; name: string; songs: PlaylistSongRef[] }) => ({
-        ...playlist,
-        songCount: playlist.songs?.length || 0,
-        hasSelectedSong: normalizedSelectedSongId
-          ? playlist.songs?.some(
-              (playlistSong) => String(playlistSong.id) === normalizedSelectedSongId
-            ) || false
-          : false
-      })
-    );
+    return (data?.playlists?.playlists || [])
+      .map(
+        (playlist: {
+          id: string;
+          name: string;
+          songs: PlaylistSongRef[];
+          lastUpdate?: string;
+          lastAccessed?: string;
+          cover_art?: string;
+        }) => ({
+          ...playlist,
+          songCount: playlist.songs?.length || 0,
+          hasSelectedSong: normalizedSelectedSongId
+            ? playlist.songs?.some(
+                (playlistSong) => String(playlistSong.id) === normalizedSelectedSongId
+              ) || false
+            : false
+        })
+      )
+      .sort((left, right) => comparePlaylistNames(left.name, right.name));
   }, [data?.playlists?.playlists, selectedSongId]);
 
   const playlistTotalCount = data?.playlists?.totalItemsCount || playlists.length;
@@ -285,6 +314,99 @@ export default function usePlaylists({
     [addSongToPlaylist, refetch, upsertPlaylistMutation]
   );
 
+  const renamePlaylist = useCallback(
+    async (playlistId: string, playlistName: string): Promise<PlaylistMutationResult> => {
+      const nextName = playlistName.trim();
+
+      if (!playlistId || !nextName) {
+        return {
+          success: false,
+          message: 'Enter a playlist name'
+        };
+      }
+
+      try {
+        const { data: playlistData } = await upsertPlaylistMutation({
+          variables: {
+            input: {
+              id: playlistId,
+              name: nextName
+            }
+          }
+        });
+
+        const updatedPlaylistId = playlistData?.upsertPlaylist?.id as string | undefined;
+
+        if (!updatedPlaylistId) {
+          return {
+            success: false,
+            message: 'Could not rename playlist'
+          };
+        }
+
+        await refetch();
+
+        return {
+          success: true,
+          message: `Renamed to ${nextName}`
+        };
+      } catch (_error) {
+        return {
+          success: false,
+          message: 'Could not rename playlist'
+        };
+      }
+    },
+    [refetch, upsertPlaylistMutation]
+  );
+
+  const deletePlaylist = useCallback(
+    async (playlistId: string): Promise<PlaylistMutationResult> => {
+      if (!playlistId) {
+        return {
+          success: false,
+          message: 'Playlist is missing'
+        };
+      }
+
+      try {
+        const deletedPlaylistName =
+          playlists.find((playlist) => String(playlist.id) === String(playlistId))
+            ?.name || 'playlist';
+
+        const { data: deletedPlaylistData } = await deletePlaylistMutation({
+          variables: {
+            playlistId
+          }
+        });
+
+        const deletedPlaylistId = deletedPlaylistData?.deletePlaylist?.id as
+          | string
+          | undefined;
+
+        if (!deletedPlaylistId) {
+          return {
+            success: false,
+            message: 'Could not delete playlist'
+          };
+        }
+
+        await refetch();
+
+        return {
+          success: true,
+          message: `Deleted ${deletedPlaylistName}`
+        };
+      } catch (_error) {
+        return {
+          success: false,
+          message: 'Could not delete playlist'
+        };
+      }
+    },
+    [deletePlaylistMutation, playlists, refetch]
+  );
+
   return {
     playlists,
     playlistTotalCount,
@@ -298,6 +420,8 @@ export default function usePlaylists({
     addSongToPlaylist,
     removeSongFromPlaylist,
     toggleSongInPlaylist,
-    createPlaylist
+    createPlaylist,
+    renamePlaylist,
+    deletePlaylist
   };
 }

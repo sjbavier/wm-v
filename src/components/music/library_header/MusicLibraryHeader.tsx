@@ -58,17 +58,17 @@ const MusicLibraryHeader = ({
 const HeaderShell = styled.section`
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  padding: 1rem 1.1rem;
-  border-radius: 1.2rem;
-  border: 1px solid ${alpha('var(--mantine-color-green-9)', 0.14)};
+  gap: 0.8rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1.15rem;
+  border: 1px solid ${alpha('var(--mantine-color-green-9)', 0.15)};
   background: linear-gradient(
     180deg,
-    ${alpha('#000', 0.18)} 0%,
-    ${alpha('#000', 0.34)} 100%
+    ${alpha('#000', 0.16)} 0%,
+    ${alpha('#000', 0.32)} 100%
   );
   box-shadow:
-    0 18px 36px rgba(0, 0, 0, 0.2),
+    0 16px 32px rgba(0, 0, 0, 0.18),
     inset 0 1px 0 ${alpha('#fff', 0.04)};
 `;
 
@@ -76,7 +76,7 @@ const HeaderTop = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.85rem;
 
   @media screen and (max-width: 720px) {
     flex-direction: column;
@@ -86,7 +86,7 @@ const HeaderTop = styled.div`
 const HeaderCopy = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.22rem;
+  gap: 0.2rem;
   min-width: 0;
 `;
 
@@ -98,7 +98,7 @@ const Eyebrow = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95);
 `;
@@ -106,8 +106,8 @@ const Title = styled.div`
 const Description = styled.div`
   max-width: 48rem;
   color: rgba(255, 255, 255, 0.66);
-  font-size: 0.84rem;
-  line-height: 1.5;
+  font-size: 0.82rem;
+  line-height: 1.45;
 `;
 
 const ActionRail = styled.div`
@@ -118,12 +118,12 @@ const ActionRail = styled.div`
 
 const ControlRail = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem) auto;
-  gap: 0.75rem;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) minmax(11.5rem, 14rem) auto;
+  gap: 0.65rem;
+  align-items: stretch;
 
   @media screen and (max-width: 960px) {
-    grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+    grid-template-columns: minmax(0, 1fr) minmax(11.5rem, 14rem);
   }
 
   @media screen and (max-width: 720px) {
@@ -133,13 +133,15 @@ const ControlRail = styled.div`
 
 const ControlCard = styled.div<{ $wide?: boolean }>`
   min-width: 0;
+  display: flex;
+  align-items: stretch;
   width: ${({ $wide }) => ($wide ? '100%' : 'auto')};
 `;
 
 const SummaryRail = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.45rem;
 `;
 
 const StatusRail = styled.div`

@@ -27,7 +27,8 @@ This backlog tracks the second round of player-focused improvements after the ph
 - [ ] Promote playlists beyond the current drawer into a dedicated route or persistent sidebar
 - [x] Expand the library header beyond current text search and page-level sorting with richer filtering
 - [x] Clarify queue-source status in the UI when the filtered-library queue is still syncing or falls back to the current page
-- [ ] Add playlist sorting, rename, and delete flows once backend support and product rules are clear
+- [x] Add playlist sorting, rename, and delete flows in the shared drawer
+- [x] Add playlist browsing as a drawer-to-library shortcut inside `/media`
 - [ ] Consolidate older exploratory music components around the current library-header and playlist-drawer approach
 - [ ] Consider moving the playlist drawer state fully into shared context if more library surfaces need to open it
 - [ ] Finish responsive polish after the single-scroll/mobile-disclosure pass, with focus on the now-playing/player block and remaining small-screen density issues
@@ -36,3 +37,8 @@ This backlog tracks the second round of player-focused improvements after the ph
 ## Progress Notes
 
 - Progress: `/media` now uses mobile disclosure for filters and summary details, and no longer relies on a second vertical scroll region inside the page view.
+- Progress: the compact player pass now hides secondary metadata on XS/SM so timeline and transport stay foregrounded while the desktop layout keeps the fuller metadata treatment.
+- Progress: the shared playlist drawer now supports client-side sorting plus inline rename and delete management flows on top of create and membership actions.
+- Progress: playlist rows in the shared drawer can now jump the user into playlist browsing by applying the library playlist filter directly.
+- Progress: on larger screens, the sticky player now compacts further while scrolling so the player and library header read as one stacked control system.
+- Progress: grid cards and per-track playlist controls now use smaller control footprints and closer border-radius/border-accent values so the library surface reads more consistently with the sticky player and drawer.

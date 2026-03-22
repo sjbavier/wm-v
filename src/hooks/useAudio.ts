@@ -16,7 +16,6 @@ export default function useAudio() {
   >(undefined);
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
   const pendingPlayRef = useRef(false);
 
   const setPlaybackState = useCallback((intent: PlaybackIntent) => {
@@ -35,13 +34,6 @@ export default function useAudio() {
   const handlePlayClick = useCallback(() => {
     togglePlayback();
   }, [togglePlayback]);
-
-  const stopAnimationFrame = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-  }, []);
 
   const playPlayback = useCallback(() => {
     pendingPlayRef.current = false;
@@ -65,10 +57,8 @@ export default function useAudio() {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
-
-      stopAnimationFrame();
     },
-    [setCurrentTime, stopAnimationFrame]
+    [setCurrentTime]
   );
 
   const restartPlayback = useCallback(
@@ -87,10 +77,9 @@ export default function useAudio() {
         setIsPlaying(true);
       } else {
         setIsPlaying(false);
-        stopAnimationFrame();
       }
     },
-    [setCurrentTime, stopAnimationFrame]
+    [setCurrentTime]
   );
 
   const syncPlaybackState = useCallback(() => {
@@ -103,8 +92,7 @@ export default function useAudio() {
     setCurrentTime(0);
     setDuration(0);
     setMarks(undefined);
-    stopAnimationFrame();
-  }, [setCurrentTime, setDuration, setMarks, stopAnimationFrame]);
+  }, [setCurrentTime, setDuration, setMarks]);
 
   const clearPendingPlay = useCallback(() => {
     pendingPlayRef.current = false;
@@ -114,34 +102,24 @@ export default function useAudio() {
     pendingPlayRef.current = true;
   }, []);
 
-  const updateCurrentTime = useCallback(() => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-      animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
-    }
-  }, [setCurrentTime]);
-
   useEffect(() => {
     if (!audioRef.current) {
       return;
     }
+
     if (isPlaying) {
       audioRef.current.play().catch(() => {
         setIsPlaying(false);
       });
-      // start animation loop
-      animationFrameRef.current = requestAnimationFrame(updateCurrentTime);
     } else {
       audioRef.current.pause();
-      stopAnimationFrame();
     }
-  }, [isPlaying, stopAnimationFrame, updateCurrentTime]);
+  }, [isPlaying]);
 
   const handleTimeUpdate = () => {
     syncPlaybackState();
   };
 
-  // Helper function to format time in seconds to mm:ss
   const formatTime = useCallback((seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -150,27 +128,33 @@ export default function useAudio() {
 
   const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-      setMarks([
-        {
-          value: Math.floor(audioRef.current.duration / 4),
-          label: `${formatTime(Math.floor(audioRef.current.duration / 4))}`
-        },
-        {
-          value: Math.floor(audioRef.current.duration / 2),
-          label: `${formatTime(Math.floor(audioRef.current.duration / 2))}`
-        },
-        {
-          value: Math.floor((audioRef.current.duration / 4) * 3),
-          label: `${formatTime(
-            Math.floor((audioRef.current.duration / 4) * 3)
-          )}`
-        },
-        {
-          value: audioRef.current.duration,
-          label: `${formatTime(audioRef.current.duration)}`
-        }
-      ]);
+      const nextDuration = audioRef.current.duration;
+      const hasValidDuration =
+        Number.isFinite(nextDuration) && nextDuration > 0;
+
+      setDuration(hasValidDuration ? nextDuration : 0);
+      setMarks(
+        hasValidDuration
+          ? [
+              {
+                value: Math.floor(nextDuration / 4),
+                label: `${formatTime(Math.floor(nextDuration / 4))}`
+              },
+              {
+                value: Math.floor(nextDuration / 2),
+                label: `${formatTime(Math.floor(nextDuration / 2))}`
+              },
+              {
+                value: Math.floor((nextDuration / 4) * 3),
+                label: `${formatTime(Math.floor((nextDuration / 4) * 3))}`
+              },
+              {
+                value: nextDuration,
+                label: `${formatTime(nextDuration)}`
+              }
+            ]
+          : undefined
+      );
 
       if (pendingPlayRef.current) {
         pendingPlayRef.current = false;
@@ -185,14 +169,6 @@ export default function useAudio() {
       setCurrentTime(value);
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, []);
 
   return {
     isPlaying,

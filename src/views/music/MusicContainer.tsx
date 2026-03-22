@@ -40,6 +40,7 @@ const SHUFFLE_STORAGE_KEY = 'music:shuffle';
 const REPEAT_STORAGE_KEY = 'music:repeat';
 
 const getSongKey = (value: Song | undefined) => String(value?.id ?? '');
+type PlaylistSortMode = 'name-asc' | 'name-desc' | 'tracks-desc' | 'tracks-asc';
 
 const compareText = (left?: string, right?: string) => {
   return (left || '').localeCompare(right || '', undefined, {
@@ -192,6 +193,10 @@ const MusicContainer = () => {
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [creatingPlaylist, setCreatingPlaylist] = useState(false);
   const [playlistFeedback, setPlaylistFeedback] = useState('');
+  const [playlistSortMode, setPlaylistSortMode] =
+    useState<PlaylistSortMode>('name-asc');
+  const [playlistActionBusy, setPlaylistActionBusy] = useState(false);
+  const [isPlayerCompact, setIsPlayerCompact] = useState(false);
   const [shuffleEnabled, setShuffleEnabled] = useState(() => getStoredShuffle());
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(() =>
     getStoredRepeatMode()
@@ -264,7 +269,9 @@ const MusicContainer = () => {
     errorMessage: playlistsError,
     getSongPlaylistCount,
     toggleSongInPlaylist,
-    createPlaylist
+    createPlaylist,
+    renamePlaylist,
+    deletePlaylist
   } = usePlaylists({
     selectedSongId: song?.id
   });
@@ -390,6 +397,15 @@ const MusicContainer = () => {
   useEffect(() => {
     setPage(0);
   }, [playlistFilter, artistFilter, albumFilter, genreFilter, setPage]);
+
+  useEffect(() => {
+    if (
+      playlistFilter !== 'all' &&
+      !playlists.some((playlist) => String(playlist.id) === playlistFilter)
+    ) {
+      setPlaylistFilter('all');
+    }
+  }, [playlistFilter, playlists]);
 
   useEffect(() => {
     if (!isCompactScreen) {
@@ -582,7 +598,7 @@ const MusicContainer = () => {
 
       if (isSameSong) {
         if (options?.autoplay) {
-          playPlayback?.();
+          restartPlayback?.({ autoplay: true });
         }
         return;
       }
@@ -590,7 +606,7 @@ const MusicContainer = () => {
       resetPlayback?.({ autoplay: options?.autoplay });
       setSong(nextSong);
     },
-    [playPlayback, resetPlayback, song?.id]
+    [resetPlayback, restartPlayback, song?.id]
   );
 
   const playPreviousTrack = useCallback(() => {
@@ -682,6 +698,22 @@ const MusicContainer = () => {
     return () => window.clearTimeout(timeout);
   }, [playlistFeedback]);
 
+  useEffect(() => {
+    if (isCompactScreen) {
+      setIsPlayerCompact(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      setIsPlayerCompact(window.scrollY > 96);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isCompactScreen]);
+
   useCoverart({ song, convertBase64ToImage });
   useEffect(() => {
     const options = {
@@ -707,27 +739,100 @@ const MusicContainer = () => {
   }, [imageUrl]);
 
   const handleCreatePlaylist = useCallback(async () => {
-    if (!newPlaylistName.trim()) {
+    if (!newPlaylistName.trim() || playlistActionBusy) {
       return;
     }
 
+    setPlaylistActionBusy(true);
     setCreatingPlaylist(true);
-    const result = await createPlaylist(newPlaylistName, { songId: song?.id });
-    setPlaylistFeedback(result.message);
+    try {
+      const result = await createPlaylist(newPlaylistName, { songId: song?.id });
+      setPlaylistFeedback(result.message);
 
-    if (result.success) {
-      setNewPlaylistName('');
+      if (result.success) {
+        setNewPlaylistName('');
+      }
+    } finally {
+      setCreatingPlaylist(false);
+      setPlaylistActionBusy(false);
     }
-
-    setCreatingPlaylist(false);
-  }, [createPlaylist, newPlaylistName, song?.id]);
+  }, [createPlaylist, newPlaylistName, playlistActionBusy, song?.id]);
 
   const handleTogglePlaylistMembership = useCallback(
     async (playlistId: string) => {
+      if (playlistActionBusy) {
+        return;
+      }
+
       const result = await toggleSongInPlaylist(playlistId, song?.id);
       setPlaylistFeedback(result.message);
     },
-    [song?.id, toggleSongInPlaylist]
+    [playlistActionBusy, song?.id, toggleSongInPlaylist]
+  );
+
+  const handleRenamePlaylist = useCallback(
+    async (playlistId: string, nextName: string) => {
+      if (playlistActionBusy) {
+        return {
+          success: false,
+          message: 'Playlist action already in progress'
+        };
+      }
+
+      setPlaylistActionBusy(true);
+      try {
+        const result = await renamePlaylist(playlistId, nextName);
+        setPlaylistFeedback(result.message);
+        return result;
+      } finally {
+        setPlaylistActionBusy(false);
+      }
+    },
+    [playlistActionBusy, renamePlaylist]
+  );
+
+  const handleDeletePlaylist = useCallback(
+    async (playlistId: string) => {
+      if (playlistActionBusy) {
+        return {
+          success: false,
+          message: 'Playlist action already in progress'
+        };
+      }
+
+      setPlaylistActionBusy(true);
+      try {
+        const result = await deletePlaylist(playlistId);
+        if (result.success && playlistFilter === playlistId) {
+          setPlaylistFilter('all');
+        }
+        setPlaylistFeedback(result.message);
+        return result;
+      } finally {
+        setPlaylistActionBusy(false);
+      }
+    },
+    [deletePlaylist, playlistActionBusy, playlistFilter]
+  );
+
+  const handleBrowsePlaylist = useCallback(
+    (playlistId: string) => {
+      const selectedPlaylist = playlists.find(
+        (playlist) => String(playlist.id) === String(playlistId)
+      );
+
+      setPlaylistFilter(String(playlistId));
+      setPage(0);
+      setPlaylistsOpen(false);
+      setMobileFiltersExpanded(false);
+      setMobileSummaryExpanded(false);
+      setPlaylistFeedback(
+        selectedPlaylist?.name
+          ? `Browsing ${selectedPlaylist.name}`
+          : 'Browsing playlist'
+      );
+    },
+    [playlists]
   );
 
   return (
@@ -792,6 +897,7 @@ const MusicContainer = () => {
             <MusicPlayer
               musicSrc={musicSrc}
               song={song}
+              compact={isPlayerCompact}
             />
             <LibraryHeaderWrap>
               <MusicLibraryHeader
@@ -1000,9 +1106,14 @@ const MusicContainer = () => {
           selectedSongMembershipCount={selectedSongMembershipCount}
           newPlaylistName={newPlaylistName}
           onNewPlaylistNameChange={setNewPlaylistName}
+          playlistSortMode={playlistSortMode}
+          onPlaylistSortModeChange={setPlaylistSortMode}
           onCreatePlaylist={handleCreatePlaylist}
           creatingPlaylist={creatingPlaylist}
           onTogglePlaylistMembership={song ? handleTogglePlaylistMembership : undefined}
+          onBrowsePlaylist={handleBrowsePlaylist}
+          onRenamePlaylist={handleRenamePlaylist}
+          onDeletePlaylist={handleDeletePlaylist}
         />
       </AudioContainer>
     </MusicContextProvider>

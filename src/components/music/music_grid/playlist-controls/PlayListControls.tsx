@@ -140,25 +140,27 @@ const PlayListControlsContainer = styled.div<{ $compact?: boolean }>`
   flex-direction: column;
   align-items: center;
   justify-content: end;
-  gap: 0.35rem;
-  border-radius: 18px;
+  gap: 0.3rem;
+  border-radius: 16px;
   padding: ${({ $compact }) => ($compact ? '0' : '0.15rem 0.3rem')};
 `;
 
 const StyledMenu = styled(Menu)`
   .mantine-Menu-dropdown {
-    background: rgba(30, 40, 50, 0.55);
-    border: 1.5px solid rgba(80, 255, 180, 0.18);
-    border-radius: 18px;
-    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.18);
+    background: linear-gradient(180deg, rgba(10, 16, 18, 0.96), rgba(10, 16, 18, 0.9));
+    border: 1px solid rgba(80, 255, 180, 0.16);
+    border-radius: 16px;
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(8px);
     color: var(--mantine-color-green-4);
-    padding: 0.5rem 0.25rem;
+    padding: 0.45rem 0.25rem;
   }
 
   .mantine-Menu-item {
     color: var(--mantine-color-green-4);
-    border-radius: 12px;
+    border-radius: 10px;
     font-weight: 500;
     transition:
       background 0.15s,
@@ -178,8 +180,8 @@ const StyledMenu = styled(Menu)`
   .mantine-Menu-label {
     color: var(--mantine-color-green-3);
     font-weight: 600;
-    font-size: 0.95em;
-    margin-bottom: 0.2em;
+    font-size: 0.88rem;
+    margin-bottom: 0.15rem;
   }
 
   .mantine-Menu-itemSection[data-position='right'] {
@@ -188,8 +190,8 @@ const StyledMenu = styled(Menu)`
   }
 
   .mantine-Menu-arrow {
-    border-color: rgba(80, 255, 180, 0.18);
-    background: rgba(30, 40, 50, 0.55);
+    border-color: rgba(80, 255, 180, 0.16);
+    background: rgba(10, 16, 18, 0.96);
     backdrop-filter: blur(8px);
   }
 `;
@@ -199,22 +201,26 @@ const ControlButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
   font-weight: 700;
-  border: 1.5px solid rgba(80, 255, 180, 0.18);
-  background: rgba(30, 40, 50, 0.45);
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(80, 255, 180, 0.16);
+  background: linear-gradient(180deg, rgba(30, 40, 50, 0.6), rgba(12, 16, 22, 0.62));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 20px rgba(0, 0, 0, 0.14);
   color: var(--mantine-color-green-4);
   transition:
     background 0.18s,
     color 0.18s,
-    box-shadow 0.18s;
+    box-shadow 0.18s,
+    border-color 0.18s,
+    transform 0.18s;
 
   & > svg {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1.08rem;
+    height: 1.08rem;
     color: inherit;
   }
 
@@ -222,8 +228,11 @@ const ControlButton = styled.button`
   &:focus-visible {
     color: var(--mantine-color-green-2);
     background: rgba(80, 255, 180, 0.1);
-    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.22);
-    border-color: rgba(80, 255, 180, 0.38);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 14px 24px rgba(0, 0, 0, 0.2);
+    border-color: rgba(80, 255, 180, 0.32);
+    transform: translateY(-1px);
     outline: none;
   }
 `;
@@ -231,24 +240,20 @@ const ControlButton = styled.button`
 const PlaylistTrigger = styled.button<{ $compact?: boolean }>`
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  min-height: ${({ $compact }) => ($compact ? '2.35rem' : '2.65rem')};
-  padding: ${({ $compact }) => ($compact ? '0.35rem 0.7rem' : '0.45rem 0.9rem')};
-  border-radius: 999px;
-  border: 1px solid rgba(80, 255, 180, 0.24);
-  background: linear-gradient(
-    180deg,
-    rgba(30, 40, 50, 0.62),
-    rgba(12, 16, 22, 0.62)
-  );
+  gap: 0.5rem;
+  min-height: ${({ $compact }) => ($compact ? '2.2rem' : '2.45rem')};
+  padding: ${({ $compact }) => ($compact ? '0.3rem 0.7rem' : '0.38rem 0.85rem')};
+  border-radius: 16px;
+  border: 1px solid rgba(80, 255, 180, 0.18);
+  background: linear-gradient(180deg, rgba(30, 40, 50, 0.58), rgba(12, 16, 22, 0.6));
   color: var(--mantine-color-green-3);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   cursor: pointer;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 12px 28px rgba(0, 0, 0, 0.16);
+    0 12px 24px rgba(0, 0, 0, 0.16);
   transition:
     border-color 150ms ease,
     color 150ms ease,
@@ -257,7 +262,7 @@ const PlaylistTrigger = styled.button<{ $compact?: boolean }>`
 
   &:hover {
     color: var(--mantine-color-green-1);
-    border-color: rgba(80, 255, 180, 0.45);
+    border-color: rgba(80, 255, 180, 0.32);
     transform: translateY(-1px);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.05),
@@ -273,12 +278,12 @@ const PlaylistTrigger = styled.button<{ $compact?: boolean }>`
 const TriggerLabel = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   white-space: nowrap;
 
   & > span:last-child {
-    min-width: 1.35rem;
-    padding: 0.15rem 0.35rem;
+    min-width: 1.25rem;
+    padding: 0.12rem 0.32rem;
     border-radius: 999px;
     background: rgba(80, 255, 180, 0.12);
     color: var(--mantine-color-green-1);
@@ -294,12 +299,12 @@ const MembershipCheck = styled.span`
 `;
 
 const FeedbackMessage = styled.div`
-  margin: 0.25rem 0.35rem 0.55rem;
-  padding: 0.45rem 0.65rem;
-  border-radius: 0.8rem;
+  margin: 0.2rem 0.3rem 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.75rem;
   background: rgba(80, 255, 180, 0.08);
   color: var(--mantine-color-green-1);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   line-height: 1.35;
 `;
 

@@ -269,13 +269,13 @@ const SongMetaData = styled.div`
   flex-wrap: wrap;
   width: 100%;
   margin-top: auto;
-  gap: 0.5rem;
+  gap: 0.45rem;
   align-items: center;
   justify-content: space-between;
 `;
 const SongMetaDetails = styled.div`
   display: inline-flex;
-  gap: 0.2rem;
+  gap: 0.28rem;
   flex-wrap: wrap;
 `;
 const TitleRow = styled.div`
@@ -293,9 +293,9 @@ const TitleText = styled.div`
 `;
 const AlbumLine = styled.div`
   width: 100%;
-  padding-inline: 0.9rem;
-  padding-bottom: 0.55rem;
-  font-size: 0.78rem;
+  padding-inline: 0.85rem;
+  padding-bottom: 0.45rem;
+  font-size: 0.76rem;
   color: rgba(255, 255, 255, 0.72);
 `;
 const SongEntry = styled.div`
@@ -314,19 +314,19 @@ const SongRow = styled.div<SongRowProps>`
   border: 1px solid
     ${({ $isPlaying, $isSelected }) =>
       $isPlaying
-        ? alpha('var(--mantine-color-green-4)', 0.95)
+        ? alpha('var(--mantine-color-green-4)', 0.82)
         : $isSelected
-        ? alpha('var(--mantine-color-green-6)', 0.6)
+        ? alpha('var(--mantine-color-green-6)', 0.45)
         : 'transparent'};
   color: rgba(255, 255, 255, 0.88);
   width: ${({ $col }) => `calc(${$col} - 2rem)`};
   margin: 1rem;
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
   box-shadow: ${({ $isPlaying, $isSelected }) =>
     $isPlaying
-      ? `0 0 0 1px ${alpha('var(--mantine-color-green-4)', 0.5)}, 0 18px 32px rgba(0, 0, 0, 0.3)`
+      ? `0 0 0 1px ${alpha('var(--mantine-color-green-4)', 0.42)}, 0 18px 32px rgba(0, 0, 0, 0.3)`
       : $isSelected
-      ? `0 0 0 1px ${alpha('var(--mantine-color-green-7)', 0.25)}`
+      ? `0 0 0 1px ${alpha('var(--mantine-color-green-7)', 0.18)}`
       : 'none'};
   transition:
     transform 150ms ease-in-out,
@@ -346,49 +346,65 @@ const ControlButton = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-block: 0.2rem;
-  margin-right: 0.6rem;
-  border-radius: 50%;
+  margin-block: 0.15rem;
+  margin-right: 0.5rem;
+  border-radius: 999px;
   font-weight: 700;
   border-width: 1px;
-  background: transparent;
-  background: var(--shade-1);
-  border-color: ${alpha('var(--mantine-color-green-6)', 0.5)};
-  color: ${lighten('var(--mantine-color-green-5)', 0.1)};
+  background: linear-gradient(
+    180deg,
+    rgba(30, 40, 50, 0.58),
+    rgba(12, 16, 22, 0.62)
+  );
+  border-color: ${alpha('var(--mantine-color-green-6)', 0.42)};
+  color: ${lighten('var(--mantine-color-green-5)', 0.08)};
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 20px rgba(0, 0, 0, 0.14);
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
   & > svg {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1.08rem;
+    height: 1.08rem;
   }
   &.small {
-    min-width: 35px;
-    min-height: 35px;
-    width: 35px;
-    height: 35px;
+    min-width: 34px;
+    min-height: 34px;
+    width: 34px;
+    height: 34px;
     & > svg {
-      width: 1.2rem;
-      height: 1.2rem;
+      width: 1.05rem;
+      height: 1.05rem;
     }
   }
   &.large {
     @media screen and (max-width: 768px) {
-      min-width: 35px;
-      min-height: 35px;
+      min-width: 34px;
+      min-height: 34px;
     }
-    min-width: 45px;
-    min-height: 45px;
+    min-width: 42px;
+    min-height: 42px;
     & > svg {
       @media screen and (max-width: 768px) {
-        width: 1.4rem;
-        height: 1.4rem;
+        width: 1.25rem;
+        height: 1.25rem;
       }
-      width: 1.6rem;
-      height: 1.6rem;
+      width: 1.35rem;
+      height: 1.35rem;
     }
   }
   &:hover {
     color: ${lighten('var(--mantine-color-green-5)', 0.3)};
     background: ${darken('var(--mantine-color-green-3)', 0.83)};
     border-color: ${alpha('var(--mantine-color-green-6)', 0.88)};
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 14px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
   }
 `;
 
@@ -492,13 +508,13 @@ const CompactDarken = styled.div<DarkenProps>`
   flex-direction: row;
   align-items: center;
   width: 100%;
-  padding: 0.3rem 0.5rem;
-  gap: 0.6rem;
+  padding: 0.28rem 0.45rem;
+  gap: 0.5rem;
   background: ${({ $isPlaying, $isSelected }) =>
     $isPlaying
-      ? 'linear-gradient(90deg, rgba(37, 186, 107, 0.22), rgba(0, 0, 0, 0.2))'
+      ? 'linear-gradient(90deg, rgba(37, 186, 107, 0.18), rgba(0, 0, 0, 0.2))'
       : $isSelected
-      ? 'linear-gradient(90deg, rgba(37, 186, 107, 0.12), rgba(0, 0, 0, 0.12))'
+      ? 'linear-gradient(90deg, rgba(37, 186, 107, 0.1), rgba(0, 0, 0, 0.12))'
       : 'transparent'};
 
   @media screen and (max-width: 960px) {
@@ -523,14 +539,14 @@ const Darken = styled.div<DarkenProps>`
   width: 100%;
 `;
 const SongInfoChunk = styled.div`
-  padding: 0.6rem;
+  padding: 0.55rem 0.6rem;
   word-break: break-all;
   display: inline-flex;
   align-items: center;
   justify-content: start;
 
   &.title {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     width: 100%;
     background-color: var(--shade-3);
   }
@@ -538,11 +554,11 @@ const SongInfoChunk = styled.div`
 const MetaChip = styled.div`
   display: inline-flex;
   align-items: center;
-  padding: 0.22rem 0.55rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.74);
+  background: rgba(80, 255, 180, 0.08);
+  border: 1px solid rgba(80, 255, 180, 0.12);
+  color: rgba(233, 255, 244, 0.8);
   font-size: 0.66rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -550,7 +566,7 @@ const MetaChip = styled.div`
 const StateChip = styled.div<{ $isPlaying?: boolean }>`
   margin-left: auto;
   margin-right: 0.4rem;
-  padding: 0.2rem 0.55rem;
+  padding: 0.18rem 0.5rem;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -559,7 +575,7 @@ const StateChip = styled.div<{ $isPlaying?: boolean }>`
     $isPlaying ? 'var(--mantine-color-green-0)' : 'rgba(255, 255, 255, 0.76)'};
   background: ${({ $isPlaying }) =>
     $isPlaying
-      ? alpha('var(--mantine-color-green-6)', 0.85)
-      : 'rgba(255, 255, 255, 0.1)'};
+      ? alpha('var(--mantine-color-green-6)', 0.72)
+      : 'rgba(255, 255, 255, 0.08)'};
 `;
 export default MusicGrid;

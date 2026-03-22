@@ -22,11 +22,12 @@ const PLAYER_MUTED_STORAGE_KEY = 'wm-player-muted';
 interface MusicPlayerProps {
   musicSrc: string;
   song: Song | undefined;
+  compact?: boolean;
 }
 
 type RepeatMode = 'off' | 'all' | 'one';
 
-const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
+const MusicPlayer = ({ musicSrc, song, compact = false }: MusicPlayerProps) => {
   const musicContext = useMusicContext() as ReturnType<typeof useMusicContext> & {
     shuffleEnabled?: boolean;
     repeatMode?: RepeatMode;
@@ -125,14 +126,14 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
   const progressValue = duration > 0 ? Math.min(currentTime, duration) : 0;
   const progressMarks =
     screenSize === Size.SM || screenSize === Size.XS ? undefined : marks;
+  const isCompactScreen = screenSize === Size.XS || screenSize === Size.SM;
+  const isScrollCompact = compact && !isCompactScreen;
   const volumePercent = useMemo(
     () => Math.round((isMuted ? 0 : volume) * 100),
     [isMuted, volume]
   );
   const canGoPrevious = Boolean(playPreviousTrack) && hasPreviousTrack !== false;
   const canGoNext = Boolean(playNextTrack) && hasNextTrack !== false;
-  const isMobile =
-    screenSize === Size.XS || screenSize === Size.SM;
   const handlePrimaryPlaybackClick = () => {
     if (isPlaying) {
       pausePlayback?.();
@@ -165,39 +166,43 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
   const sourceLabel = extension ? `${extension} file` : 'Library track';
 
   return (
-    <AudioPlayerContainer>
-      <SongWrapper>
-        <TrackMeta>
+    <AudioPlayerContainer $compact={isScrollCompact}>
+      <SongWrapper $compact={isScrollCompact}>
+        <TrackMeta $compact={isScrollCompact}>
           <SongInfoChunk className="eyebrow">Now playing</SongInfoChunk>
           <SongInfoChunk className="title">{title || 'Select a track'}</SongInfoChunk>
           <SongInfoChunk className="artist">{artist}</SongInfoChunk>
-          <MetadataStrip>
-            <MetadataPill>
-              <MetadataLabel>Album</MetadataLabel>
-              <MetadataValue>{album}</MetadataValue>
-            </MetadataPill>
-            <MetadataPill>
-              <MetadataLabel>Source</MetadataLabel>
-              <MetadataValue>{sourceLabel}</MetadataValue>
-            </MetadataPill>
-          </MetadataStrip>
+          {!isCompactScreen ? (
+            <MetadataStrip>
+              <MetadataPill>
+                <MetadataLabel>Album</MetadataLabel>
+                <MetadataValue>{album}</MetadataValue>
+              </MetadataPill>
+              <MetadataPill>
+                <MetadataLabel>Source</MetadataLabel>
+                <MetadataValue>{sourceLabel}</MetadataValue>
+              </MetadataPill>
+            </MetadataStrip>
+          ) : null}
         </TrackMeta>
-        <TrackFacts>
-          <TrackFactCard>
-            <TrackFactValue>{genre}</TrackFactValue>
-            <TrackFactLabel>Genre</TrackFactLabel>
-          </TrackFactCard>
-          <TrackFactCard>
-            <TrackFactValue>{releaseYear}</TrackFactValue>
-            <TrackFactLabel>Year</TrackFactLabel>
-          </TrackFactCard>
-        </TrackFacts>
+        {!isCompactScreen ? (
+          <TrackFacts $compact={isScrollCompact}>
+            <TrackFactCard>
+              <TrackFactValue>{genre}</TrackFactValue>
+              <TrackFactLabel>Genre</TrackFactLabel>
+            </TrackFactCard>
+            <TrackFactCard>
+              <TrackFactValue>{releaseYear}</TrackFactValue>
+              <TrackFactLabel>Year</TrackFactLabel>
+            </TrackFactCard>
+          </TrackFacts>
+        ) : null}
       </SongWrapper>
 
-      <ControlsWrapper>
-        <ControlsContainer>
-          <TimelineWrapper>
-            <TimelineHeader>
+      <ControlsWrapper $compact={isScrollCompact}>
+        <ControlsContainer $compact={isScrollCompact}>
+          <TimelineWrapper $compact={isScrollCompact}>
+            <TimelineHeader $compact={isScrollCompact}>
               <TimelineTime>{formatTime(progressValue)}</TimelineTime>
               <TimelineLabel>{isPlaying ? 'Playing' : 'Paused'}</TimelineLabel>
               <TimelineTime>{formatTime(duration)}</TimelineTime>
@@ -209,9 +214,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
               label={formatTime}
               size={2}
               marks={progressMarks}
-              thumbSize={
-                screenSize === Size.SM || screenSize === Size.XS ? 10 : 15
-              }
+              thumbSize={isCompactScreen ? 10 : isScrollCompact ? 13 : 15}
               onChange={handleSliderChange}
             />
           </TimelineWrapper>
@@ -225,10 +228,11 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             does not support audio playback
           </AudioPlayer>
         </ControlsContainer>
-        <PlayerActions>
-          <TransportControls>
+        <PlayerActions $compact={isScrollCompact}>
+          <TransportControls $compact={isScrollCompact}>
             <ModeButton
               type="button"
+              $compact={isScrollCompact}
               $active={Boolean(toggleShuffle) && Boolean(shuffleEnabled)}
               onClick={toggleShuffle}
               aria-label={
@@ -241,6 +245,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             <ControlButton
               type="button"
               className="small"
+              $compact={isScrollCompact}
               onClick={playPreviousTrack}
               aria-label="Play previous track"
               disabled={!canGoPrevious}
@@ -250,6 +255,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             <ControlButton
               type="button"
               className="large"
+              $compact={isScrollCompact}
               onClick={handlePrimaryPlaybackClick}
               aria-label={isPlaying ? 'Pause playback' : 'Play track'}
             >
@@ -262,6 +268,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             <ControlButton
               type="button"
               className="small"
+              $compact={isScrollCompact}
               onClick={playNextTrack}
               aria-label="Play next track"
               disabled={!canGoNext}
@@ -270,6 +277,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
             </ControlButton>
             <ModeButton
               type="button"
+              $compact={isScrollCompact}
               $active={repeatMode !== 'off'}
               onClick={cycleRepeatMode}
               aria-label={`Repeat mode: ${repeatMode}`}
@@ -282,19 +290,22 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
               )}
             </ModeButton>
           </TransportControls>
-          <VolumeControls>
-            <VolumeReadout>{volumePercent}%</VolumeReadout>
+          <VolumeControls $compact={isScrollCompact}>
+            {!isCompactScreen && !isScrollCompact ? (
+              <VolumeReadout>{volumePercent}%</VolumeReadout>
+            ) : null}
             <StyledAngleSlider
               step={1}
-              size={isMobile ? 56 : 65}
+              size={isCompactScreen ? 50 : isScrollCompact ? 58 : 65}
               value={formatVolumeAsAngle(isMuted ? 0 : volume)}
               onChange={handleVolumeChange}
               formatLabel={(value) => `${Math.round(value / 3.6)}`}
-              thumbSize={isMobile ? 13 : 15}
+              thumbSize={isCompactScreen ? 12 : isScrollCompact ? 13 : 15}
             />
             <ControlButton
               type="button"
               className="small"
+              $compact={isScrollCompact}
               onClick={handleMuteClick}
               aria-label={isMuted || volume === 0 ? 'Unmute audio' : 'Mute audio'}
             >
@@ -313,7 +324,7 @@ const MusicPlayer = ({ musicSrc, song }: MusicPlayerProps) => {
   );
 };
 
-const AudioPlayerContainer = styled.div`
+const AudioPlayerContainer = styled.div<{ $compact?: boolean }>`
   width: 100%;
   display: flex;
   gap: 1rem;
@@ -321,6 +332,31 @@ const AudioPlayerContainer = styled.div`
   padding: 0.9rem 1rem 1rem;
   align-items: center;
   backdrop-filter: blur(16px);
+  transition:
+    padding 180ms ease,
+    gap 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    border-radius 180ms ease;
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    padding: 0.65rem 0.9rem 0.75rem;
+    gap: 0.75rem;
+    border-radius: 1.15rem;
+    border: 1px solid ${alpha('var(--mantine-color-green-9)', 0.15)};
+    background: linear-gradient(
+      180deg,
+      ${alpha('#000', 0.24)} 0%,
+      ${alpha('#000', 0.4)} 100%
+    );
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 ${alpha('#fff', 0.04)};
+  `
+      : ''}
 
   @media screen and (max-width: 960px) {
     flex-direction: column;
@@ -340,13 +376,14 @@ const AudioPlayerContainer = styled.div`
   }
 `;
 
-const SongWrapper = styled.div`
+const SongWrapper = styled.div<{ $compact?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex: 0 0 22rem;
   min-width: 0;
+  transition: gap 180ms ease, flex-basis 180ms ease;
 
   @media screen and (max-width: 960px) {
     flex: 1;
@@ -355,26 +392,63 @@ const SongWrapper = styled.div`
   @media screen and (max-width: 640px) {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.6rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.6rem;
+    flex-basis: 18.5rem;
+  `
+      : ''}
 `;
 
-const TrackMeta = styled.div`
+const TrackMeta = styled.div<{ $compact?: boolean }>`
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  transition: gap 180ms ease;
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.22rem;
+
+    .eyebrow {
+      font-size: 0.64rem;
+    }
+
+    .title {
+      font-size: 0.95rem;
+    }
+
+    .artist {
+      font-size: 0.76rem;
+    }
+  `
+      : ''}
 `;
 
-const TrackFacts = styled.div`
+const TrackFacts = styled.div<{ $compact?: boolean }>`
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: flex-end;
   gap: 0.5rem;
+  transition: gap 180ms ease;
 
   @media screen and (max-width: 640px) {
     align-items: flex-start;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.35rem;
+  `
+      : ''}
 `;
 
 const MetadataStrip = styled.div`
@@ -477,31 +551,48 @@ const SongInfoChunk = styled.div`
   }
 `;
 
-const ControlsWrapper = styled.div`
+const ControlsWrapper = styled.div<{ $compact?: boolean }>`
   display: inline-flex;
   justify-content: center;
   flex: 1;
   align-items: center;
   gap: 1rem;
+  transition: gap 180ms ease;
 
   @media screen and (max-width: 640px) {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 0.65rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.75rem;
+  `
+      : ''}
 `;
 
-const ControlsContainer = styled.div`
+const ControlsContainer = styled.div<{ $compact?: boolean }>`
   display: flex;
   flex: 1;
   min-width: 0;
+  transition: transform 180ms ease;
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    transform: translateY(-1px);
+  `
+      : ''}
 `;
 
-const PlayerActions = styled.div`
+const PlayerActions = styled.div<{ $compact?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.8rem;
   margin-left: 1rem;
+  transition: gap 180ms ease;
 
   @media screen and (max-width: 960px) {
     margin-left: 0;
@@ -511,11 +602,18 @@ const PlayerActions = styled.div`
   @media screen and (max-width: 640px) {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.65rem;
+    gap: 0.55rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.55rem;
+  `
+      : ''}
 `;
 
-const TimelineWrapper = styled.div`
+const TimelineWrapper = styled.div<{ $compact?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -530,24 +628,57 @@ const TimelineWrapper = styled.div`
     ${alpha('#000', 0.32)} 100%
   );
   box-shadow: inset 0 1px 0 ${alpha('#fff', 0.04)};
+  transition:
+    padding 180ms ease,
+    gap 180ms ease,
+    border-radius 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 
   @media screen and (max-width: 640px) {
-    padding: 0.8rem 0.9rem;
+    padding: 0.72rem 0.8rem;
     border-radius: 1.1rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    padding: 0.58rem 0.82rem;
+    gap: 0.3rem;
+    border-radius: 0.95rem;
+  `
+      : ''}
 `;
 
-const TimelineHeader = styled.div`
+const TimelineHeader = styled.div<{ $compact?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+  transition: gap 180ms ease;
+
+  @media screen and (max-width: 640px) {
+    gap: 0.5rem;
+  }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.45rem;
+  `
+      : ''}
 `;
 
 const TimelineTime = styled.div`
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.76rem;
   min-width: 2.5rem;
+
+  @media screen and (max-width: 640px) {
+    min-width: 2.2rem;
+    font-size: 0.72rem;
+  }
 `;
 
 const TimelineLabel = styled.div`
@@ -557,7 +688,7 @@ const TimelineLabel = styled.div`
   letter-spacing: 0.12em;
 `;
 
-const ControlButton = styled.button`
+const ControlButton = styled.button<{ $compact?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,6 +739,49 @@ const ControlButton = styled.button`
     height: 35px;
   }
 
+  ${({ $compact }) =>
+    $compact
+      ? `
+    width: 44px;
+    height: 44px;
+
+    &.large {
+      width: 50px;
+      height: 50px;
+
+      & > svg {
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+    }
+
+    &.small {
+      width: 33px;
+      height: 33px;
+    }
+  `
+      : ''}
+
+  @media screen and (max-width: 640px) {
+    width: 44px;
+    height: 44px;
+
+    &.large {
+      width: 48px;
+      height: 48px;
+
+      & > svg {
+        width: 1.35rem;
+        height: 1.35rem;
+      }
+    }
+
+    &.small {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
   &:hover {
     color: ${lighten('var(--mantine-color-green-5)', 0.3)};
     background: ${darken('var(--mantine-color-green-3)', 0.83)};
@@ -622,7 +796,7 @@ const ControlButton = styled.button`
   }
 `;
 
-const ModeButton = styled.button<{ $active: boolean }>`
+const ModeButton = styled.button<{ $active: boolean; $compact?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -667,6 +841,19 @@ const ModeButton = styled.button<{ $active: boolean }>`
     width: 1rem;
     height: 1rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    width: 32px;
+    height: 32px;
+  `
+      : ''}
+
+  @media screen and (max-width: 640px) {
+    width: 32px;
+    height: 32px;
+  }
 `;
 
 const StyledSlider = styled(Slider)`
@@ -693,13 +880,19 @@ const StyledSlider = styled(Slider)`
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.65rem;
   }
+
+  @media screen and (max-width: 640px) {
+    .mantine-Slider-thumb {
+      box-shadow: 0 0 0 3px ${alpha('var(--mantine-color-green-9)', 0.15)};
+    }
+  }
 `;
 
 const AudioPlayer = styled.audio`
   display: none;
 `;
 
-const VolumeControls = styled.div`
+const VolumeControls = styled.div<{ $compact?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -712,13 +905,28 @@ const VolumeControls = styled.div`
     ${alpha('#000', 0.14)} 0%,
     ${alpha('#000', 0.28)} 100%
   );
+  transition:
+    gap 180ms ease,
+    padding 180ms ease,
+    border-radius 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
 
   @media screen and (max-width: 640px) {
     justify-content: space-between;
+    padding: 0.4rem 0.55rem;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.35rem;
+    padding: 0.35rem 0.5rem;
+  `
+      : ''}
 `;
 
-const TransportControls = styled.div`
+const TransportControls = styled.div<{ $compact?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -730,10 +938,24 @@ const TransportControls = styled.div`
     ${alpha('#000', 0.14)} 0%,
     ${alpha('#000', 0.28)} 100%
   );
+  transition:
+    gap 180ms ease,
+    padding 180ms ease,
+    border-radius 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
 
   @media screen and (max-width: 640px) {
     justify-content: space-between;
   }
+
+  ${({ $compact }) =>
+    $compact
+      ? `
+    gap: 0.35rem;
+    padding: 0.35rem 0.5rem;
+  `
+      : ''}
 `;
 
 const VolumeReadout = styled.div`
@@ -742,6 +964,7 @@ const VolumeReadout = styled.div`
   color: rgba(255, 255, 255, 0.72);
   font-size: 0.75rem;
   letter-spacing: 0.06em;
+  white-space: nowrap;
 `;
 
 const StyledAngleSlider = styled(AngleSlider)`

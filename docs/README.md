@@ -12,7 +12,7 @@
 - Autoplay the next track when the current queued track ends
 - Use shuffle and repeat modes for transport behavior
 - Show extracted cover art colors as the page background
-- Persist volume, layout, and last selected track between sessions
+- Persist volume, mute, layout, shuffle, repeat mode, and the last selected track between sessions
 - Use a persistent library search with clearer reset behavior
 - Sort the current filtered library by title, artist, album, or recently updated
 - Refine the filtered library with client-side playlist, artist, album, and genre controls
@@ -20,8 +20,9 @@
 - Manage playlists directly from both grid and row cards with clearer feedback
 - Use a sticky library header to keep search, layout switching, result context, and playlist access together
 - Show explicit queue sync or page-fallback status when the filtered-library playback queue is still hydrating
-- Open a shared playlist drawer from the library header for overview and creation flows
-- Use a more compact, card-like player layout on smaller screens
+- Open a shared playlist drawer from the library header for overview, creation, sorting, rename, delete, and browse flows
+- Keep the player in the sticky control stack and slim it down on larger screens as the page scrolls
+- Use a more compact, card-like player layout on smaller screens that keeps timeline and transport first
 - Show richer track metadata in both the active player and library cards
 - Use a real landing page at `/` instead of a placeholder home route
 - Access auth-gated routes for other app areas such as reference content
@@ -113,16 +114,16 @@ Data flow:
 2. `useMusic` runs the `music` GraphQL query with `pageSize`, `pageNumber + 1`, and optional `searchText`.
 3. `useAudio` controls the shared `<audio>` element, play/pause state, duration, slider marks, and seek position.
 4. `MusicContextProvider` exposes this state to the player and grid components.
-5. `MusicPlayer` renders the now-playing metadata, timeline slider, transport controls, volume control, and audio element.
+5. `MusicPlayer` renders the now-playing metadata, timeline slider, transport controls, volume control, and audio element, and it can compress on larger screens once the sticky stack is in active scroll use.
 6. `MusicLibraryHeader` keeps search, client-side filters, layout switching, result context, queue sync status, and the playlist drawer entry point in one sticky library surface.
 7. `MusicGrid` renders songs in row or grid layouts and changes the selected song when an item is clicked.
-8. `PlaylistsDrawer` provides a library-level playlist overview and creation flow, while per-card controls remain lightweight shortcuts.
+8. `PlaylistsDrawer` provides a library-level playlist overview plus creation, sorting, browse, rename, and delete flows, while per-card controls remain lightweight shortcuts.
 9. `MusicContainer` keeps a paginated grid view while sorting and refining the filtered library client-side by playlist, artist, album, genre, or most recently updated.
 10. `useCoverart` and `extract-colors` derive a moving background gradient from the selected track art.
-11. `MusicContainer` hydrates the full filtered library in the background and drives previous, next, shuffle, repeat, autoplay-on-end, persisted player preferences, and the shared playlist drawer state from that filtered-library queue while the visible grid remains paginated.
+11. `MusicContainer` hydrates the full filtered library in the background with a second `music` query sized to `totalItemsCount`, then drives previous, next, shuffle, repeat, autoplay-on-end, persisted player preferences, and the shared playlist drawer state from that filtered-library queue while the visible grid remains paginated.
 12. Playback progression is container-owned: track-end handling, repeat behavior, and next-track selection flow through `MusicContainer`, while the audio hook exposes explicit play/pause/reset actions.
 
-Recent responsive cleanup reduced competing scroll and sticky layers on `/media`. On smaller breakpoints, the library header shifts to progressive disclosure for filters and detailed summary chips, and the sticky stack relaxes so the page is easier to scan and scroll. The app shell is now the main vertical scroll owner, and `/media` should avoid reintroducing its own full-height vertical scroll container.
+Recent responsive cleanup reduced competing scroll and sticky layers on `/media`. On smaller breakpoints, the library header shifts to progressive disclosure for filters and detailed summary chips, the player trims secondary metadata so timeline and transport stay dominant, and the grid plus playlist controls now use tighter sizing and radius choices to match the rest of the sticky surface system. On larger breakpoints, the player can slim down further as the sticky stack remains in view during scroll. The app shell is now the main vertical scroll owner, and `/media` should avoid reintroducing its own full-height vertical scroll container.
 
 ## Repo Layout
 
@@ -144,11 +145,11 @@ The repo is functional, but a few things are clearly still in-progress:
 - Several routes in the nav and router are commented out
 - Search is now promoted into a dedicated library header, and client-side filtering is available there, but server-backed filtering is still missing
 - Playback intent is now more explicit, and the queue follows the filtered library instead of only the visible page
-- The filtered-library queue currently depends on a background full-library hydration pass because the GraphQL music query does not yet expose server-side sorting or queue semantics
-- Playlists now have a shared drawer, but they are still not a dedicated route or persistent sidebar
+- The filtered-library queue currently depends on a background full-library hydration pass using a second `music` query sized to `totalItemsCount`, because the GraphQL music query does not yet expose server-side sorting or queue semantics
+- Playlists now have a shared drawer with create, sort, browse, rename, and delete flows, but they are still not a dedicated route or persistent sidebar
 - Song metadata fallbacks are inferred from file paths when API data is missing
 - Duration is clearest in the active player; library-level duration is still not available from the current GraphQL song query
-- Mobile density is improved, but the now-playing/player block still needs simplification on small screens
+- On XS/SM, the now-playing/player block collapses secondary metadata so timeline and transport stay foregrounded, and on larger screens it now compresses further once the sticky stack is actively in scroll use; the grid and playlist controls also follow the same tighter surface rhythm
 - Some shell and nav overlap risks remain, especially around the remaining 3D shell behavior
 
 ## Suggested Next Improvement Areas
@@ -166,7 +167,7 @@ These are good first targets for the next iteration:
 These are strong near-term tasks based on the current `/media` architecture:
 
 - Extend filtering beyond the current playlist, artist, album, and genre controls with eventual server-backed filtering
-- Extend the shared playlist drawer with rename, delete, and playlist-level browsing actions when backend behavior is ready
+- Decide whether playlist browsing should stay as a drawer-to-library shortcut or grow into a dedicated route if the drawer stops scaling
 - Resolve unrelated TypeScript and theme/reference build issues so `yarn build` passes cleanly across the whole repo
 
 ## Task Files
