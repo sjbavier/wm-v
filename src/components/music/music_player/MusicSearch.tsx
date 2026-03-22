@@ -88,8 +88,8 @@ const MusicSearch = ({
         <SearchHint>
           {hint ||
             (activeSearch
-              ? 'Filtering current library view'
-              : 'Live search across the current library view')}
+              ? 'Filtering the library grid and playback queue'
+              : 'Live search across the filtered library')}
         </SearchHint>
         <ClearAction type="button" onClick={clearSearch} disabled={!activeSearch}>
           Reset

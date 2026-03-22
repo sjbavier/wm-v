@@ -7,7 +7,10 @@ interface MusicLibraryHeaderProps {
   title?: string;
   description?: string;
   search?: React.ReactNode;
+  filtersControl?: React.ReactNode;
+  sortControl?: React.ReactNode;
   layoutToggle?: React.ReactNode;
+  statusNotice?: React.ReactNode;
   summary?: React.ReactNode;
   playlistsAction?: React.ReactNode;
 }
@@ -18,7 +21,10 @@ const MusicLibraryHeader = ({
   title = 'Library controls',
   description = 'Shape the current page before you browse the queue.',
   search,
+  filtersControl,
+  sortControl,
   layoutToggle,
+  statusNotice,
   summary,
   playlistsAction
 }: MusicLibraryHeaderProps) => {
@@ -33,13 +39,17 @@ const MusicLibraryHeader = ({
         {playlistsAction ? <ActionRail>{playlistsAction}</ActionRail> : null}
       </HeaderTop>
 
-      {(search || layoutToggle) && (
+      {(search || sortControl || layoutToggle) && (
         <ControlRail>
           {search ? <ControlCard $wide>{search}</ControlCard> : null}
+          {sortControl ? <ControlCard>{sortControl}</ControlCard> : null}
           {layoutToggle ? <ControlCard>{layoutToggle}</ControlCard> : null}
         </ControlRail>
       )}
 
+      {filtersControl ? <FiltersRail>{filtersControl}</FiltersRail> : null}
+
+      {statusNotice ? <StatusRail>{statusNotice}</StatusRail> : null}
       {summary ? <SummaryRail>{summary}</SummaryRail> : null}
     </HeaderShell>
   );
@@ -108,9 +118,13 @@ const ActionRail = styled.div`
 
 const ControlRail = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem) auto;
   gap: 0.75rem;
   align-items: end;
+
+  @media screen and (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+  }
 
   @media screen and (max-width: 720px) {
     grid-template-columns: 1fr;
@@ -126,6 +140,16 @@ const SummaryRail = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+`;
+
+const StatusRail = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const FiltersRail = styled.div`
+  display: flex;
+  min-width: 0;
 `;
 
 export default MusicLibraryHeader;

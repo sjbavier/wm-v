@@ -58,6 +58,7 @@ const PerspectiveWrapper = styled.div`
   }
 `;
 const Container = styled.div<ContainerProps>`
+  min-height: 100vh;
   padding-left: 1.25rem;
   transition:
     transform 0.4s,
@@ -66,6 +67,7 @@ const Container = styled.div<ContainerProps>`
   cursor: ${({ $isOpen }) => ($isOpen ? 'pointer' : '')};
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
   transform-origin: 50% 150%;
   transition-delay: ${({ $isOpen }) => ($isOpen ? '0.2s' : '0.4s')};
   transform: ${(props) =>
@@ -78,6 +80,7 @@ const Container = styled.div<ContainerProps>`
     transform: none;
     transition-delay: 0s;
     cursor: auto;
+    overscroll-behavior-y: auto;
   }
 `;
 export default App;

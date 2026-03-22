@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import useMusic from '../../hooks/useMusic';
-import { Alert, Skeleton, alpha, darken, Loader, Text } from '@mantine/core';
+import { Alert, Skeleton, alpha, darken, lighten, Loader, Text } from '@mantine/core';
 import Render from '../../components/render/Render';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PaginationContainer from '../../components/pagination/Pagination';
@@ -10,12 +10,17 @@ import MusicLibraryHeader from '../../components/music/library_header/MusicLibra
 import MusicSearch from '../../components/music/music_player/MusicSearch';
 import LayoutOptions from '../../components/music/music_grid/LayoutOptions';
 import PlaylistsDrawer from '../../components/music/playlists/PlaylistsDrawer';
+import FilterOptions from '../../components/music/library_header/FilterOptions';
+import SortOptions, {
+  MusicSortOption
+} from '../../components/music/library_header/SortOptions';
 import { useDebouncedValue } from '@mantine/hooks';
 import {
   MusicContextProvider,
   RepeatMode
 } from '../../providers/useMusicContext';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { Size } from '../../hooks/useMediaQuery';
 import { extractColors } from 'extract-colors';
 import { useBase64ToImage } from '../../hooks/useBase64ToImage';
 import { Layout } from '../../constants/constants';
@@ -35,6 +40,61 @@ const SHUFFLE_STORAGE_KEY = 'music:shuffle';
 const REPEAT_STORAGE_KEY = 'music:repeat';
 
 const getSongKey = (value: Song | undefined) => String(value?.id ?? '');
+
+const compareText = (left?: string, right?: string) => {
+  return (left || '').localeCompare(right || '', undefined, {
+    sensitivity: 'base'
+  });
+};
+
+const sortSongs = (songs: Song[], sortOption: MusicSortOption) => {
+  const nextSongs = [...songs];
+
+  switch (sortOption) {
+    case 'title':
+      return nextSongs.sort((left, right) =>
+        compareText(left.title || left.path, right.title || right.path)
+      );
+    case 'artist':
+      return nextSongs.sort((left, right) => {
+        const primaryComparison = compareText(left.artist, right.artist);
+        return primaryComparison !== 0
+          ? primaryComparison
+          : compareText(left.title || left.path, right.title || right.path);
+      });
+    case 'album':
+      return nextSongs.sort((left, right) => {
+        const primaryComparison = compareText(left.album, right.album);
+        return primaryComparison !== 0
+          ? primaryComparison
+          : compareText(left.title || left.path, right.title || right.path);
+      });
+    case 'recent':
+      return nextSongs.sort((left, right) => {
+        const leftTime = left.lastUpdate ? new Date(left.lastUpdate).getTime() : 0;
+        const rightTime = right.lastUpdate ? new Date(right.lastUpdate).getTime() : 0;
+        return rightTime - leftTime;
+      });
+    default:
+      return nextSongs;
+  }
+};
+
+const getFilterValue = (value?: string, fallback = 'Unknown') => {
+  const trimmedValue = value?.trim();
+  return trimmedValue || fallback;
+};
+
+const buildFilterOptions = (songs: Song[], getValue: (song: Song) => string) => {
+  return Array.from(new Set(songs.map(getValue)))
+    .sort((left, right) =>
+      left.localeCompare(right, undefined, { sensitivity: 'base' })
+    )
+    .map((value) => ({
+      value,
+      label: value
+    }));
+};
 
 const shuffleIds = (ids: string[]) => {
   const nextIds = [...ids];
@@ -136,14 +196,20 @@ const MusicContainer = () => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(() =>
     getStoredRepeatMode()
   );
+  const [sortOption, setSortOption] = useState<MusicSortOption>('default');
+  const [playlistFilter, setPlaylistFilter] = useState('all');
+  const [artistFilter, setArtistFilter] = useState('all');
+  const [albumFilter, setAlbumFilter] = useState('all');
+  const [genreFilter, setGenreFilter] = useState('all');
+  const [mobileFiltersExpanded, setMobileFiltersExpanded] = useState(false);
+  const [mobileSummaryExpanded, setMobileSummaryExpanded] = useState(false);
   const [shuffleOrder, setShuffleOrder] = useState<string[]>([]);
 
   const {
     data,
     errors,
     loading,
-    totalItemsCount,
-    totalPageCount: pageCount
+    totalItemsCount
   } = useMusic({
     pageSize,
     pageNumber: page,
@@ -152,15 +218,45 @@ const MusicContainer = () => {
   });
   const hasErrors =
     Array.isArray(errors) && errors.length > 0 && errors[0] !== undefined;
-  const hasSongs = Array.isArray(data) && data.length > 0;
+  const normalizedSearchKey = searchText?.trim() || '';
+  const canTreatCurrentPageAsFullQueue =
+    !loading && !hasErrors && (totalItemsCount || 0) <= pageSize;
+  const shouldFetchLibraryQueue =
+    !loading && !hasErrors && (totalItemsCount || 0) > pageSize;
+  const {
+    data: libraryQueueData,
+    errors: libraryQueueErrors,
+    loading: libraryQueueLoading
+  } = useMusic({
+    pageSize: Math.max(totalItemsCount || 0, pageSize),
+    pageNumber: 0,
+    searchText,
+    skip: !shouldFetchLibraryQueue
+  });
+  const [hydratedLibraryQueueKey, setHydratedLibraryQueueKey] = useState('');
+  const hasLibraryQueueErrors =
+    Array.isArray(libraryQueueErrors) &&
+    libraryQueueErrors.length > 0 &&
+    libraryQueueErrors[0] !== undefined;
   const hasSearchQuery = !!searchText?.trim();
-  const showNoResults = !loading && !hasErrors && !hasSongs && hasSearchQuery;
-  const showEmptyLibrary = !loading && !hasErrors && !hasSongs && !hasSearchQuery;
-  const showMusicGrid = !loading && !hasErrors && hasSongs;
+  const isCompactScreen = screenSize === Size.XS || screenSize === Size.SM;
+  const currentPageSongs = useMemo(() => {
+    const pageSongs = Array.isArray(data) ? data : [];
+    return sortSongs(pageSongs, sortOption);
+  }, [data, sortOption]);
+  const hasHydratedLibraryQueue =
+    hydratedLibraryQueueKey === normalizedSearchKey &&
+    Array.isArray(libraryQueueData);
+  const isLibraryQueueReady =
+    hydratedLibraryQueueKey === normalizedSearchKey &&
+    (canTreatCurrentPageAsFullQueue || hasHydratedLibraryQueue);
+  const queueSourceSongs = useMemo(() => {
+    if (hasHydratedLibraryQueue) {
+      return libraryQueueData;
+    }
 
-  const queue = useMemo(() => {
-    return Array.isArray(data) ? data : [];
-  }, [data]);
+    return currentPageSongs;
+  }, [currentPageSongs, hasHydratedLibraryQueue, libraryQueueData]);
   const {
     playlists,
     playlistTotalCount,
@@ -172,20 +268,164 @@ const MusicContainer = () => {
   } = usePlaylists({
     selectedSongId: song?.id
   });
+  const playlistOptions = useMemo(() => {
+    return playlists.map((playlist) => ({
+      value: String(playlist.id),
+      label: `${playlist.name} (${playlist.songCount})`
+    }));
+  }, [playlists]);
+  const playlistSongIds = useMemo(() => {
+    return new Set(
+      playlists
+        .find((playlist) => String(playlist.id) === playlistFilter)
+        ?.songs?.map((playlistSong) => String(playlistSong.id)) || []
+    );
+  }, [playlistFilter, playlists]);
+  const artistOptions = useMemo(
+    () => buildFilterOptions(queueSourceSongs, (queueSong) => getFilterValue(queueSong.artist, 'Unknown artist')),
+    [queueSourceSongs]
+  );
+  const albumOptions = useMemo(
+    () => buildFilterOptions(queueSourceSongs, (queueSong) => getFilterValue(queueSong.album, 'Unknown album')),
+    [queueSourceSongs]
+  );
+  const genreOptions = useMemo(
+    () => buildFilterOptions(queueSourceSongs, (queueSong) => getFilterValue(queueSong.genre, 'Unknown genre')),
+    [queueSourceSongs]
+  );
+  const hasActiveFacetFilters =
+    playlistFilter !== 'all' ||
+    artistFilter !== 'all' ||
+    albumFilter !== 'all' ||
+    genreFilter !== 'all';
+  const filteredSongs = useMemo(() => {
+    return queueSourceSongs.filter((queueSong) => {
+      const matchesPlaylist =
+        playlistFilter === 'all' || playlistSongIds.has(getSongKey(queueSong));
+      const matchesArtist =
+        artistFilter === 'all' ||
+        getFilterValue(queueSong.artist, 'Unknown artist') === artistFilter;
+      const matchesAlbum =
+        albumFilter === 'all' ||
+        getFilterValue(queueSong.album, 'Unknown album') === albumFilter;
+      const matchesGenre =
+        genreFilter === 'all' ||
+        getFilterValue(queueSong.genre, 'Unknown genre') === genreFilter;
+
+      return matchesPlaylist && matchesArtist && matchesAlbum && matchesGenre;
+    });
+  }, [
+    albumFilter,
+    artistFilter,
+    genreFilter,
+    playlistFilter,
+    playlistSongIds,
+    queueSourceSongs
+  ]);
+  const queue = useMemo(() => {
+    return sortSongs(filteredSongs, sortOption);
+  }, [filteredSongs, sortOption]);
+  const visibleSongs = useMemo(() => {
+    if (!isLibraryQueueReady) {
+      return sortSongs(filteredSongs, sortOption);
+    }
+
+    const startIndex = page * pageSize;
+    return queue.slice(startIndex, startIndex + pageSize);
+  }, [filteredSongs, isLibraryQueueReady, page, pageSize, queue, sortOption]);
+  const hasVisibleSongs = visibleSongs.length > 0;
+  const showLoadingState = loading && !hasVisibleSongs;
+  const showNoResults =
+    !showLoadingState &&
+    !hasErrors &&
+    !hasVisibleSongs &&
+    (hasSearchQuery || hasActiveFacetFilters);
+  const showEmptyLibrary =
+    !showLoadingState &&
+    !hasErrors &&
+    !hasVisibleSongs &&
+    !hasSearchQuery &&
+    !hasActiveFacetFilters;
+  const showMusicGrid = !hasErrors && hasVisibleSongs;
   const selectedSongLabel = useMemo(() => {
     return song?.title || song?.path || 'Selected track';
   }, [song?.path, song?.title]);
   const selectedSongMembershipCount = getSongPlaylistCount(song?.id);
   const summaryText =
-    queue.length === 1
+    visibleSongs.length === 1
       ? '1 track on this page'
-      : `${queue.length} tracks on this page`;
+      : `${visibleSongs.length} tracks on this page`;
+  const filteredSummaryText =
+    queue.length === 1 ? '1 track after filters' : `${queue.length} tracks after filters`;
   const layoutLabel = layout === Layout.GRID ? 'Grid' : 'Row';
+  const sortLabel = useMemo(() => {
+    switch (sortOption) {
+      case 'title':
+        return 'Title';
+      case 'artist':
+        return 'Artist';
+      case 'album':
+        return 'Album';
+      case 'recent':
+        return 'Recently updated';
+      default:
+        return 'Library order';
+    }
+  }, [sortOption]);
+  const queueScopeLabel = isLibraryQueueReady
+    ? 'Queue: filtered library'
+    : hasLibraryQueueErrors
+      ? 'Queue fallback: current page'
+      : 'Queue syncing: filtered library';
+  const showQueueStatusNotice =
+    shouldFetchLibraryQueue && (!isLibraryQueueReady || hasLibraryQueueErrors);
+  const queueStatusTone = hasLibraryQueueErrors ? 'warning' : 'info';
+  const queueStatusTitle = hasLibraryQueueErrors
+    ? 'Playback queue fallback'
+    : 'Syncing filtered-library queue';
+  const queueStatusText = hasLibraryQueueErrors
+    ? 'Playback is temporarily limited to the visible page because the filtered-library queue could not be refreshed.'
+    : 'The page is ready to browse, but previous, next, shuffle, repeat, and client-side playlist or library filters are still syncing to the full filtered library.';
+  const effectivePageCount = Math.max(1, Math.ceil(queue.length / pageSize));
+  useEffect(() => {
+    setPage(0);
+  }, [playlistFilter, artistFilter, albumFilter, genreFilter, setPage]);
+
+  useEffect(() => {
+    if (!isCompactScreen) {
+      setMobileFiltersExpanded(false);
+      setMobileSummaryExpanded(false);
+    }
+  }, [isCompactScreen]);
+
+  useEffect(() => {
+    if (page > effectivePageCount - 1) {
+      setPage(Math.max(effectivePageCount - 1, 0));
+    }
+  }, [effectivePageCount, page, setPage]);
 
   const queueSongIds = useMemo(
     () => queue.map((queueSong) => getSongKey(queueSong)),
     [queue]
   );
+
+  useEffect(() => {
+    if (canTreatCurrentPageAsFullQueue) {
+      setHydratedLibraryQueueKey(normalizedSearchKey);
+      return;
+    }
+
+    if (!libraryQueueLoading && !hasLibraryQueueErrors && Array.isArray(libraryQueueData)) {
+      setHydratedLibraryQueueKey(normalizedSearchKey);
+    }
+  }, [
+    hasLibraryQueueErrors,
+    canTreatCurrentPageAsFullQueue,
+    libraryQueueData,
+    libraryQueueLoading,
+    normalizedSearchKey,
+    shouldFetchLibraryQueue
+  ]);
 
   useEffect(() => {
     if (!shuffleEnabled) {
@@ -249,6 +489,92 @@ const MusicContainer = () => {
     queueIndex > -1 &&
     (queueIndex < playbackQueue.length - 1 ||
       (repeatMode === 'all' && playbackQueue.length > 1));
+  const summaryChips = useMemo(() => {
+    const chips: React.ReactNode[] = [
+      <SummaryChip key="page-summary">{summaryText}</SummaryChip>,
+      <SummaryChip key="library-count">{totalItemsCount || 0} tracks in library</SummaryChip>,
+      <SummaryChip key="filtered-summary">{filteredSummaryText}</SummaryChip>,
+      <SummaryChip key="queue-count">{queue.length} tracks in queue</SummaryChip>,
+      <SummaryChip key="page-count">Viewing page {page + 1} of {effectivePageCount}</SummaryChip>,
+      <SummaryChip key="sort">Grid sorted by {sortLabel}</SummaryChip>,
+      <SummaryChip key="layout">{layoutLabel} layout</SummaryChip>,
+      <SummaryChip key="queue-scope">{queueScopeLabel}</SummaryChip>
+    ];
+
+    if (hasSearchQuery) {
+      chips.push(<SummaryChip key="search">Search: {searchText?.trim()}</SummaryChip>);
+    }
+
+    if (playlistFilter !== 'all') {
+      chips.push(
+        <SummaryChip key="playlist-filter">
+          Playlist:{' '}
+          {playlists.find((playlist) => String(playlist.id) === playlistFilter)?.name ||
+            'Selected'}
+        </SummaryChip>
+      );
+    }
+
+    if (artistFilter !== 'all') {
+      chips.push(<SummaryChip key="artist-filter">Artist: {artistFilter}</SummaryChip>);
+    }
+
+    if (albumFilter !== 'all') {
+      chips.push(<SummaryChip key="album-filter">Album: {albumFilter}</SummaryChip>);
+    }
+
+    if (genreFilter !== 'all') {
+      chips.push(<SummaryChip key="genre-filter">Genre: {genreFilter}</SummaryChip>);
+    }
+
+    if (song && queueIndex > -1) {
+      chips.push(
+        <SummaryChip key="queue-position">
+          Queue position {queueIndex + 1} of {playbackQueue.length}
+        </SummaryChip>
+      );
+    }
+
+    if (song && queueIndex === -1) {
+      chips.push(
+        <SummaryChip key="queue-missing">
+          Current track is outside the filtered queue
+        </SummaryChip>
+      );
+    }
+
+    if (song) {
+      chips.push(
+        <SummaryChip key="selected-track">
+          Selected: {song.title || song.path || 'track'}
+        </SummaryChip>
+      );
+    }
+
+    return chips;
+  }, [
+    albumFilter,
+    artistFilter,
+    effectivePageCount,
+    filteredSummaryText,
+    genreFilter,
+    hasSearchQuery,
+    layoutLabel,
+    page,
+    playbackQueue.length,
+    playlistFilter,
+    playlists,
+    queue.length,
+    queueIndex,
+    queueScopeLabel,
+    searchText,
+    song,
+    sortLabel,
+    summaryText,
+    totalItemsCount
+  ]);
+  const visibleSummaryChips =
+    isCompactScreen && !mobileSummaryExpanded ? summaryChips.slice(0, 6) : summaryChips;
 
   const selectSong = useCallback(
     (nextSong: Song, options?: { autoplay?: boolean }) => {
@@ -469,25 +795,71 @@ const MusicContainer = () => {
             />
             <LibraryHeaderWrap>
               <MusicLibraryHeader
-                title="Browse the current page"
-                description="Search the filtered library, switch layout, and manage playlists from one place."
+                title="Browse the filtered library"
+                description="Browse a paginated grid, sort the filtered library, and control playback from the filtered-library queue."
                 search={<MusicSearch />}
+                filtersControl={
+                  <FilterPanel>
+                    {isCompactScreen ? (
+                      <MobileControlButton
+                        type="button"
+                        onClick={() => setMobileFiltersExpanded((value) => !value)}
+                        aria-expanded={mobileFiltersExpanded}
+                      >
+                        {mobileFiltersExpanded ? 'Hide filters' : 'Refine library'}
+                      </MobileControlButton>
+                    ) : null}
+                    {(!isCompactScreen || mobileFiltersExpanded) && (
+                      <FilterOptions
+                        playlistValue={playlistFilter}
+                        artistValue={artistFilter}
+                        albumValue={albumFilter}
+                        genreValue={genreFilter}
+                        playlistOptions={playlistOptions}
+                        artistOptions={artistOptions}
+                        albumOptions={albumOptions}
+                        genreOptions={genreOptions}
+                        onPlaylistChange={setPlaylistFilter}
+                        onArtistChange={setArtistFilter}
+                        onAlbumChange={setAlbumFilter}
+                        onGenreChange={setGenreFilter}
+                        onClear={() => {
+                          setPlaylistFilter('all');
+                          setArtistFilter('all');
+                          setAlbumFilter('all');
+                          setGenreFilter('all');
+                        }}
+                      />
+                    )}
+                  </FilterPanel>
+                }
+                sortControl={
+                  <SortOptions value={sortOption} onChange={setSortOption} />
+                }
                 layoutToggle={<LayoutOptions />}
+                statusNotice={
+                  showQueueStatusNotice ? (
+                    <QueueStatusNotice $tone={queueStatusTone}>
+                      <QueueStatusEyebrow>
+                        {queueStatusTitle}
+                      </QueueStatusEyebrow>
+                      <QueueStatusText>{queueStatusText}</QueueStatusText>
+                    </QueueStatusNotice>
+                  ) : null
+                }
                 summary={
-                  <HeaderSummary>
-                    <SummaryChip>{summaryText}</SummaryChip>
-                    <SummaryChip>{totalItemsCount || 0} tracks in library</SummaryChip>
-                    <SummaryChip>{layoutLabel} layout</SummaryChip>
-                    <SummaryChip>Queue follows filtered page</SummaryChip>
-                    {hasSearchQuery ? (
-                      <SummaryChip>Search: {searchText?.trim()}</SummaryChip>
+                  <SummaryPanel>
+                    <HeaderSummary>{visibleSummaryChips}</HeaderSummary>
+                    {isCompactScreen && summaryChips.length > 6 ? (
+                      <SummaryToggleButton
+                        type="button"
+                        onClick={() => setMobileSummaryExpanded((value) => !value)}
+                        aria-expanded={mobileSummaryExpanded}
+                      >
+                        {mobileSummaryExpanded ? 'Show less' : 'Show more details'}
+                      </SummaryToggleButton>
                     ) : null}
-                    {song ? (
-                      <SummaryChip>
-                        Selected: {song.title || song.path || 'track'}
-                      </SummaryChip>
-                    ) : null}
-                  </HeaderSummary>
+                  </SummaryPanel>
                 }
                 playlistsAction={
                   <LibraryPlaylistButton
@@ -503,10 +875,10 @@ const MusicContainer = () => {
               />
             </LibraryHeaderWrap>
             <PaginationContainer
-              pageCount={pageCount || 1}
+              pageCount={effectivePageCount}
               setPageSize={setPageSize}
               pageSize={pageSize}
-              totalItemsCount={totalItemsCount}
+              totalItemsCount={queue.length}
               page={page}
               setPage={setPage}
               clearSelected={() => {}}
@@ -534,7 +906,7 @@ const MusicContainer = () => {
               </StateAlert>
             </StateContainer>
           </Render>
-          <Render if={loading}>
+          <Render if={showLoadingState}>
             <LoadingStateContainer>
               <LoadingHeader>
                 <div>
@@ -574,21 +946,27 @@ const MusicContainer = () => {
               <EmptyStateCard>
                 <StateEyebrow>No matches</StateEyebrow>
                 <StateHeading>
-                  Nothing matched “{searchText?.trim()}”
+                  {hasSearchQuery
+                    ? `Nothing matched “${searchText?.trim()}”`
+                    : 'No tracks match the current filters'}
                 </StateHeading>
                 <StateText>
-                  Try a broader artist, album, title, or genre search. The
-                  current queue is derived from the filtered results on this
-                  page.
+                  Try broader artist, album, title, genre, or client-side filter
+                  choices. Playback follows the filtered library once the queue
+                  sync completes.
                 </StateText>
                 <StateButton
                   type="button"
                   onClick={() => {
                     setSearch('');
+                    setPlaylistFilter('all');
+                    setArtistFilter('all');
+                    setAlbumFilter('all');
+                    setGenreFilter('all');
                     setPage(0);
                   }}
                 >
-                  Clear search
+                  Clear filters
                 </StateButton>
               </EmptyStateCard>
             </StateContainer>
@@ -607,7 +985,7 @@ const MusicContainer = () => {
           </Render>
           <Render if={showMusicGrid}>
             <MusicGridContainer>
-              <MusicGrid data={data} setSong={setSong} />
+              <MusicGrid data={visibleSongs} setSong={setSong} />
             </MusicGridContainer>
           </Render>
         </BlurLayer>
@@ -635,14 +1013,22 @@ const StickyContainer = styled.div`
   position: sticky;
   top: 0;
   left: 0;
-  width: 100%; /* Ensure it takes full width */
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   backdrop-filter: brightness(0.05%);
   z-index: 100;
-  background-color: var(--shade-1);
+  background: linear-gradient(180deg, rgba(10, 14, 18, 0.96), rgba(10, 14, 18, 0.82));
   padding-bottom: 0.85rem;
+
+  @media screen and (max-width: 960px) {
+    padding-bottom: 0.7rem;
+  }
+
+  @media screen and (max-width: 768px) {
+    position: static;
+  }
 `;
 
 const AudioContainer = styled.div<AudioContainerProps>`
@@ -652,16 +1038,18 @@ const AudioContainer = styled.div<AudioContainerProps>`
   --shade-4: rgba(0, 0, 0, 0.86);
 
   margin-left: 48px;
-  min-height: 100vh; /* Use viewport height for full-screen */
+  min-height: 100vh;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* Wrap in a pseudo-element to allow rotation */
+
+  @media screen and (max-width: 960px) {
+    margin-left: 0;
+  }
 
   &:before {
     content: '';
-    /* Make the pseudo-element bigger than the container */
     position: absolute;
     top: 10%;
     left: 10%;
@@ -682,9 +1070,7 @@ const AudioContainer = styled.div<AudioContainerProps>`
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     transform-origin: center center;
 
-    /* The rotation animation */
     animation: rotateGradient 300s ease-in-out infinite;
-    /* The rotation animation */
     z-index: -1;
   }
 
@@ -719,11 +1105,11 @@ const AudioContainer = styled.div<AudioContainerProps>`
 
 const BlurLayer = styled.div`
   backdrop-filter: blur(200px);
-  /* background-color: var(--shade-1); */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* Enable vertical scrolling */
+  flex: 1;
+  overflow-x: clip;
 `;
 
 const LibraryHeaderWrap = styled.div`
@@ -731,6 +1117,10 @@ const LibraryHeaderWrap = styled.div`
 
   @media screen and (max-width: 960px) {
     padding-inline: 0.85rem;
+  }
+
+  @media screen and (max-width: 640px) {
+    padding-inline: 0.7rem;
   }
 `;
 
@@ -751,6 +1141,90 @@ const SummaryChip = styled.div`
   font-size: 0.68rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+`;
+
+const QueueStatusNotice = styled.div<{ $tone: 'info' | 'warning' }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  width: 100%;
+  padding: 0.72rem 0.85rem;
+  border-radius: 0.95rem;
+  border: 1px solid
+    ${({ $tone }) =>
+      $tone === 'warning'
+        ? 'rgba(255, 164, 91, 0.26)'
+        : alpha('var(--mantine-color-green-7)', 0.22)};
+  background: ${({ $tone }) =>
+    $tone === 'warning'
+      ? 'linear-gradient(180deg, rgba(110, 59, 22, 0.28), rgba(29, 16, 9, 0.32))'
+      : 'linear-gradient(180deg, rgba(25, 82, 54, 0.2), rgba(8, 18, 13, 0.3))'};
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+`;
+
+const QueueStatusEyebrow = styled.div`
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+`;
+
+const QueueStatusText = styled.div`
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.8rem;
+  line-height: 1.5;
+`;
+
+const FilterPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+`;
+
+const SummaryPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+`;
+
+const MobileControlButton = styled.button`
+  width: 100%;
+  min-height: 2.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.95rem;
+  border: 1px solid ${alpha('var(--mantine-color-green-6)', 0.3)};
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.3));
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    border-color: ${alpha('var(--mantine-color-green-6)', 0.55)};
+    color: ${lighten('var(--mantine-color-green-4)', 0.12)};
+  }
+`;
+
+const SummaryToggleButton = styled.button`
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: ${lighten('var(--mantine-color-green-5)', 0.12)};
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    color: ${lighten('var(--mantine-color-green-4)', 0.22)};
+  }
 `;
 
 const LibraryPlaylistButton = styled.button`
@@ -786,6 +1260,11 @@ const LibraryPlaylistButton = styled.button`
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.05),
       0 16px 32px rgba(0, 0, 0, 0.22);
+  }
+
+  @media screen and (max-width: 640px) {
+    width: 100%;
+    justify-content: center;
   }
 `;
 
