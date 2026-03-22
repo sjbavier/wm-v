@@ -1,271 +1,133 @@
-import { alpha, darken, lighten, Menu, TextInput } from '@mantine/core';
-// import type { MenuProps } from '@mantine/core'; // No longer needed if using styled-components for Menu
+import { Menu } from '@mantine/core';
 import {
+  IconExternalLink,
   IconMusicPlus,
   IconPlaylist,
   IconPlaylistAdd
 } from '@tabler/icons-react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Render from '../../../render/Render';
+import useMusicContext from '../../../../providers/useMusicContext';
 
 interface IPlayListControls {
-  // Assuming Song type is defined elsewhere
   song: Song;
   currentPlayList?: string;
   style: React.CSSProperties;
+  compact?: boolean;
 }
-
-import { useState, useCallback } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-
-const ADD_SONG_TO_PLAYLIST = gql`
-  mutation AddSongToPlaylist($playlistId: ID!, $songId: ID!) {
-    addSongToPlaylist(playlistId: $playlistId, songId: $songId) {
-      id
-      name
-      songs {
-        id
-        title
-      }
-    }
-  }
-`;
-
-const UPSERT_PLAYLIST = gql`
-  mutation UpsertPlaylist($input: PlaylistInput!) {
-    upsertPlaylist(input: $input) {
-      id
-      name
-    }
-  }
-`;
-
-const REMOVE_SONG_FROM_PLAYLIST = gql`
-  mutation RemoveSongFromPlaylist($playlistId: ID!, $songId: ID!) {
-    removeSongFromPlaylist(playlistId: $playlistId, songId: $songId) {
-      id
-      name
-      songs {
-        id
-        title
-      }
-    }
-  }
-`;
-
-const GET_PLAYLISTS = gql`
-  query GetPlaylists {
-    playlists {
-      playlists {
-        id
-        name
-        songs {
-          id
-        }
-      }
-    }
-  }
-`;
 
 const PlayListControls = ({
   song,
   currentPlayList,
-  style
+  style,
+  compact = false
 }: IPlayListControls) => {
-  const { data, loading, error, refetch } = useQuery(GET_PLAYLISTS);
-
-  const [addSongToPlaylist] = useMutation(ADD_SONG_TO_PLAYLIST);
-  const [removeSongFromPlaylist] = useMutation(REMOVE_SONG_FROM_PLAYLIST);
-  const [upsertPlaylist] = useMutation(UPSERT_PLAYLIST);
-
-  const [newPlaylistName, setNewPlaylistName] = useState('');
-  const [creatingPlaylist, setCreatingPlaylist] = useState(false);
-
-  const playlists = data?.playlists?.playlists || [];
-
-  const handleToggleCurrentPlaylist = useCallback(async () => {
-    if (!currentPlayList) return;
-    // Find the current playlist object
-    const playlist = playlists.find(
-      (pl: { id: string; songs: { id: string }[] }) =>
-        String(pl.id) === String(currentPlayList)
-    );
-    const isInPlaylist = playlist?.songs?.some(
-      (s: { id: string }) => String(s.id) === String(song.id)
-    );
-    try {
-      if (isInPlaylist) {
-        await removeSongFromPlaylist({
-          variables: {
-            playlistId: currentPlayList,
-            songId: song.id
-          }
-        });
-        console.log(`Removed song "${song.title}" from current playlist.`);
-      } else {
-        await addSongToPlaylist({
-          variables: {
-            playlistId: currentPlayList,
-            songId: song.id
-          }
-        });
-        console.log(`Added song "${song.title}" to current playlist.`);
-      }
-      await refetch();
-    } catch (err) {
-      console.error('Error toggling song in current playlist:', err);
-    }
-  }, [
-    addSongToPlaylist,
-    removeSongFromPlaylist,
-    currentPlayList,
+  const {
     playlists,
-    song.id,
-    song.title,
-    refetch
-  ]);
+    playlistsLoading,
+    playlistsError,
+    isSongInPlaylist,
+    getSongPlaylistCount,
+    toggleSongInPlaylist,
+    openPlaylistDrawer
+  } = useMusicContext();
+  const [feedback, setFeedback] = useState('');
+  const playlistCount = getSongPlaylistCount?.(song.id) || 0;
+  const membershipLabel =
+    playlistCount > 0
+      ? `Saved in ${playlistCount} playlist${playlistCount === 1 ? '' : 's'}`
+      : 'Not saved to a playlist yet';
+  const currentPlaylist = useMemo(() => {
+    return (playlists || []).find(
+      (playlist) => String(playlist.id) === String(currentPlayList)
+    );
+  }, [currentPlayList, playlists]);
 
-  const handleAddToSelectedPlaylist = useCallback(
-    async (playlistId: string) => {
-      try {
-        await addSongToPlaylist({
-          variables: {
-            playlistId,
-            songId: song.id
-          }
-        });
-        await refetch();
-        console.log(
-          `Added song "${song.title}" to playlist with id ${playlistId}.`
-        );
-      } catch (err) {
-        console.error('Error adding song to playlist:', err);
-      }
-    },
-    [addSongToPlaylist, song.id, song.title, refetch]
-  );
-
-  const handleCreatePlaylist = useCallback(async () => {
-    if (!newPlaylistName.trim()) return;
-    setCreatingPlaylist(true);
-    try {
-      const { data } = await upsertPlaylist({
-        variables: {
-          input: {
-            name: newPlaylistName.trim()
-          }
-        }
-      });
-      if (data?.upsertPlaylist?.id) {
-        console.log(`Created new playlist: ${newPlaylistName}`);
-        setNewPlaylistName('');
-        refetch();
-      }
-    } catch (err) {
-      console.error('Error creating playlist:', err);
-    } finally {
-      setCreatingPlaylist(false);
+  useEffect(() => {
+    if (!feedback) {
+      return;
     }
-  }, [newPlaylistName, setCreatingPlaylist, upsertPlaylist, refetch]);
+
+    const timeout = window.setTimeout(() => setFeedback(''), 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [feedback]);
+
+  const handleToggleSong = async (playlistId: string) => {
+    if (!toggleSongInPlaylist) {
+      return;
+    }
+
+    const result = await toggleSongInPlaylist(playlistId, song.id);
+    setFeedback(result.message);
+  };
 
   return (
-    <PlayListControlsContainer style={style}>
-      <Render if={!!currentPlayList}>
+    <PlayListControlsContainer style={style} $compact={compact}>
+      <Render if={!!currentPlayList && !!currentPlaylist}>
         <ControlButton
-          onClick={handleToggleCurrentPlaylist}
-          title="Toggle in Current Playlist"
+          type="button"
+          onClick={() => handleToggleSong(String(currentPlayList))}
+          title="Toggle in current playlist"
+          aria-label="Toggle song in current playlist"
         >
           <IconMusicPlus />
         </ControlButton>
       </Render>
       <StyledMenu position="left" withArrow closeOnItemClick={false}>
         <Menu.Target>
-          <ControlButton title="Add to Playlist">
+          <PlaylistTrigger
+            type="button"
+            title="Manage playlists for this track"
+            aria-label="Manage playlists for this track"
+            $compact={compact}
+          >
             <IconPlaylistAdd />
-          </ControlButton>
+            <TriggerLabel>
+              <span>Playlists</span>
+              <span>{playlistCount}</span>
+            </TriggerLabel>
+          </PlaylistTrigger>
         </Menu.Target>
         <Menu.Dropdown>
-          {loading && <Menu.Item disabled>Loading playlists...</Menu.Item>}
-          {error && <Menu.Item disabled>Error loading playlists</Menu.Item>}
-          {!loading && !error && playlists.length === 0 && (
+          <Menu.Label>{membershipLabel}</Menu.Label>
+          <Render if={!!feedback}>
+            <FeedbackMessage>{feedback}</FeedbackMessage>
+          </Render>
+          {playlistsLoading && <Menu.Item disabled>Loading playlists...</Menu.Item>}
+          {playlistsError && <Menu.Item disabled>{playlistsError}</Menu.Item>}
+          {!playlistsLoading && !playlistsError && (playlists || []).length === 0 && (
             <Menu.Item disabled>No playlists available</Menu.Item>
           )}
-          {!loading &&
-            !error &&
-            playlists.map(
-              (playlist: {
-                id: string;
-                name: string;
-                songs: { id: string }[];
-              }) => {
-                const isInPlaylist = playlist.songs?.some(
-                  (s: { id: string }) => String(s.id) === String(song.id)
-                );
-                return (
-                  <Menu.Item
-                    key={playlist.id}
-                    leftSection={<IconPlaylist />}
-                    rightSection={
-                      isInPlaylist ? (
-                        <span
-                          style={{
-                            color: 'var(--mantine-color-green-7)',
-                            fontWeight: 'bold',
-                            fontSize: 22,
-                            marginLeft: 8,
-                            filter:
-                              'drop-shadow(0 0 2px var(--mantine-color-green-3))'
-                          }}
-                          aria-label="Song is in this playlist"
-                          title="Song is in this playlist"
-                        >
-                          ✔
-                        </span>
-                      ) : null
-                    }
-                    onClick={async () => {
-                      if (isInPlaylist) {
-                        await removeSongFromPlaylist({
-                          variables: {
-                            playlistId: playlist.id,
-                            songId: song.id
-                          }
-                        });
-                        await refetch();
-                      } else {
-                        await handleAddToSelectedPlaylist(playlist.id);
-                      }
-                    }}
-                  >
-                    {playlist.name}
-                  </Menu.Item>
-                );
-              }
-            )}
+          {!playlistsLoading &&
+            !playlistsError &&
+            (playlists || []).map((playlist) => {
+              const isInPlaylist = isSongInPlaylist?.(playlist.id, song.id) || false;
+
+              return (
+                <Menu.Item
+                  key={playlist.id}
+                  leftSection={<IconPlaylist />}
+                  rightSection={
+                    isInPlaylist ? (
+                      <MembershipCheck
+                        aria-label="Song is in this playlist"
+                        title="Song is in this playlist"
+                      >
+                        ✓
+                      </MembershipCheck>
+                    ) : null
+                  }
+                  onClick={() => handleToggleSong(playlist.id)}
+                >
+                  {playlist.name}
+                </Menu.Item>
+              );
+            })}
           <Menu.Divider />
-          <Menu.Label>Create New Playlist</Menu.Label>
-          <Menu.Item onClick={(e) => e.stopPropagation()}>
-            <TextInput
-              placeholder="New playlist name"
-              value={newPlaylistName}
-              onChange={(e) => setNewPlaylistName(e.currentTarget.value)}
-              disabled={creatingPlaylist}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleCreatePlaylist();
-                }
-              }}
-            />
-          </Menu.Item>
-          <Menu.Item
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCreatePlaylist();
-            }}
-            disabled={creatingPlaylist || !newPlaylistName.trim()}
-          >
-            Create
+          <Menu.Item leftSection={<IconExternalLink />} onClick={openPlaylistDrawer}>
+            Open playlist library
           </Menu.Item>
         </Menu.Dropdown>
       </StyledMenu>
@@ -273,18 +135,17 @@ const PlayListControls = ({
   );
 };
 
-const PlayListControlsContainer = styled.div`
+const PlayListControlsContainer = styled.div<{ $compact?: boolean }>`
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: end;
-  gap: 0.5rem;
-  /* Glassmorphism effect */
+  gap: 0.35rem;
   border-radius: 18px;
-  padding: 0.15rem 0.3rem;
+  padding: ${({ $compact }) => ($compact ? '0' : '0.15rem 0.3rem')};
 `;
 
 const StyledMenu = styled(Menu)`
-  /* Glassmorphism for dropdown */
   .mantine-Menu-dropdown {
     background: rgba(30, 40, 50, 0.55);
     border: 1.5px solid rgba(80, 255, 180, 0.18);
@@ -302,6 +163,7 @@ const StyledMenu = styled(Menu)`
     transition:
       background 0.15s,
       color 0.15s;
+
     &[data-hovered='true'],
     &:hover {
       color: var(--mantine-color-green-2);
@@ -320,6 +182,11 @@ const StyledMenu = styled(Menu)`
     margin-bottom: 0.2em;
   }
 
+  .mantine-Menu-itemSection[data-position='right'] {
+    min-width: 1.3rem;
+    justify-content: center;
+  }
+
   .mantine-Menu-arrow {
     border-color: rgba(80, 255, 180, 0.18);
     background: rgba(30, 40, 50, 0.55);
@@ -327,7 +194,7 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
-const ControlButton = styled.div`
+const ControlButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -344,35 +211,13 @@ const ControlButton = styled.div`
     background 0.18s,
     color 0.18s,
     box-shadow 0.18s;
+
   & > svg {
     width: 1.2rem;
     height: 1.2rem;
     color: inherit;
   }
-  &.large {
-    @media screen and (max-width: 768px) {
-      width: 55px;
-      height: 55px;
-    }
-    width: 55px;
-    height: 55px;
-    & > svg {
-      @media screen and (max-width: 768px) {
-        width: 1.6rem;
-        height: 1.6rem;
-      }
-      width: 1.4rem;
-      height: 1.4rem;
-    }
-  }
-  &.small {
-    width: 35px;
-    height: 35px;
-    & > svg {
-      width: 1.2rem;
-      height: 1.2rem;
-    }
-  }
+
   &:hover,
   &:focus-visible {
     color: var(--mantine-color-green-2);
@@ -381,6 +226,81 @@ const ControlButton = styled.div`
     border-color: rgba(80, 255, 180, 0.38);
     outline: none;
   }
+`;
+
+const PlaylistTrigger = styled.button<{ $compact?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: ${({ $compact }) => ($compact ? '2.35rem' : '2.65rem')};
+  padding: ${({ $compact }) => ($compact ? '0.35rem 0.7rem' : '0.45rem 0.9rem')};
+  border-radius: 999px;
+  border: 1px solid rgba(80, 255, 180, 0.24);
+  background: linear-gradient(
+    180deg,
+    rgba(30, 40, 50, 0.62),
+    rgba(12, 16, 22, 0.62)
+  );
+  color: var(--mantine-color-green-3);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 12px 28px rgba(0, 0, 0, 0.16);
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+
+  &:hover {
+    color: var(--mantine-color-green-1);
+    border-color: rgba(80, 255, 180, 0.45);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 16px 32px rgba(0, 0, 0, 0.22);
+  }
+
+  & > svg {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+const TriggerLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+
+  & > span:last-child {
+    min-width: 1.35rem;
+    padding: 0.15rem 0.35rem;
+    border-radius: 999px;
+    background: rgba(80, 255, 180, 0.12);
+    color: var(--mantine-color-green-1);
+    text-align: center;
+  }
+`;
+
+const MembershipCheck = styled.span`
+  color: var(--mantine-color-green-7);
+  font-weight: 700;
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 2px var(--mantine-color-green-3));
+`;
+
+const FeedbackMessage = styled.div`
+  margin: 0.25rem 0.35rem 0.55rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.8rem;
+  background: rgba(80, 255, 180, 0.08);
+  color: var(--mantine-color-green-1);
+  font-size: 0.75rem;
+  line-height: 1.35;
 `;
 
 export default PlayListControls;

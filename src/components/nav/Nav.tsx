@@ -52,7 +52,7 @@ const Nav: FC<NavProps> = ({
     setPopUp(!popUp);
   };
 
-  const handleSettingsClick = (_ev: React.MouseEvent<HTMLDivElement>): void => {
+  const handleSettingsClick = (): void => {
     setSettings(!settings);
   };
 
@@ -64,20 +64,15 @@ const Nav: FC<NavProps> = ({
         )}
       >
         <NavContainer $isOpen={isOpen} className="flex flex-col h-full">
-          <div
-            className="flex justify-center items-center cursor-pointer"
-            onClick={() => navigate('')}
-          >
+          <BrandHeader onClick={() => navigate('')}>
             <img
               className="w-full pt-1 pb-1"
               src={webmaneLogo}
               alt="Webmane logo"
               style={{ maxWidth: 'calc(200px / 3)' }}
             />
-          </div>
-          <h1 className="text-zinc-50 text-center tracking-widest text-xs uppercase -mt-10 mb-8 ">
-            webmane
-          </h1>
+            <BrandTitle>webmane</BrandTitle>
+          </BrandHeader>
           <div className="grow ">
             <NeuButton
               onClick={() => navigate('')}
@@ -212,7 +207,7 @@ const UserBox = styled.div`
   cursor: pointer;
 `;
 
-const UserPopUp: FC<DivWrapper> = ({ callback, children, ...rest }) => {
+const UserPopUp: FC<DivWrapper> = ({ children, ...rest }) => {
   return <div {...rest}>{children}</div>;
 };
 const UserPopUpWrapper = styled(UserPopUp)`
@@ -234,8 +229,34 @@ const UserPopUpWrapper = styled(UserPopUp)`
   }
 `;
 
+const BrandHeader = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 1.8rem;
+`;
+
+const BrandTitle = styled.div`
+  color: #f8fafc;
+  text-align: center;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  line-height: 1;
+`;
+
 const NavWrapper = styled.div`
   perspective: 1500px;
+
+  @media screen and (max-width: 960px) {
+    width: min(20rem, calc(100vw - 2rem));
+  }
 `;
 const NavContainer = styled.div<NavContainerProps>`
   font-size: 145%;
@@ -252,6 +273,13 @@ const NavContainer = styled.div<NavContainerProps>`
     props.$isOpen
       ? 'translateZ(-400px) rotateY(10deg) translateX(15%)'
       : 'translateZ(-1500px)'};
+
+  @media screen and (max-width: 960px) {
+    font-size: 110%;
+    padding: 1.25rem 1rem 1.5rem;
+    transform: ${({ $isOpen }) =>
+      $isOpen ? 'translateZ(0) translateX(0)' : 'translateX(-120%)'};
+  }
 `;
 
 export default Nav;

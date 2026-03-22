@@ -1,10 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
-import { LoginContainer, MusicContainer, ReferenceContainer } from '../views';
+import {
+  HomeContainer,
+  LoginContainer,
+  MusicContainer,
+  ReferenceContainer
+} from '../views';
 import PrivateRoute from '../components/auth/PrivateRoute';
 const WMRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<div>Home</div>} />
+      <Route path="/" element={<HomeContainer />} />
       <Route path="/login" element={<LoginContainer />} />
       <Route path="/media" element={<MusicContainer />} />
       {/* <Route path="/signup" element={<SignupForm />} />

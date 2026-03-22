@@ -34,7 +34,7 @@ const App: FC = () => {
       <NavButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
       <Nav isOpen={isOpen} color={color} setColor={setColor} />
       <Container
-        onClick={(_) => isOpen && toggleIsOpen()}
+        onClick={() => isOpen && toggleIsOpen()}
         $isOpen={isOpen}
         className={classNames(
           `absolute w-full h-full drop-shadow-sm filter bg-wm_dk_blue-700 ${
@@ -52,6 +52,10 @@ const App: FC = () => {
 const PerspectiveWrapper = styled.div`
   background: ${(props) => props.color};
   perspective: 1500px;
+
+  @media screen and (max-width: 960px) {
+    perspective: none;
+  }
 `;
 const Container = styled.div<ContainerProps>`
   padding-left: 1.25rem;
@@ -60,12 +64,20 @@ const Container = styled.div<ContainerProps>`
     background-size 0.4s,
     filter 1.4s;
   cursor: ${({ $isOpen }) => ($isOpen ? 'pointer' : '')};
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
   transform-origin: 50% 150%;
   transition-delay: ${({ $isOpen }) => ($isOpen ? '0.2s' : '0.4s')};
   transform: ${(props) =>
     props.$isOpen
       ? 'translateZ(-600px) rotateY(-50deg) translateX(10%)'
       : 'none'};
+
+  @media screen and (max-width: 960px) {
+    padding-left: 0;
+    transform: none;
+    transition-delay: 0s;
+    cursor: auto;
+  }
 `;
 export default App;
